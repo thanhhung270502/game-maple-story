@@ -60,16 +60,16 @@ class Game(CommonFunc):
                     self.actions['pause'] = True
                 if event.key == pygame.K_RETURN:
                     self.actions['start'] = True
-                if event.key == pygame.K_LEFT:
-                    self.actions['moveLeft'] = True
-                if event.key == pygame.K_RIGHT:
-                    self.actions['moveRight'] = True
-                if event.key == pygame.K_UP:
-                    self.actions['moveUp'] = True
-                if event.key == pygame.K_DOWN:
-                    self.actions['moveDown'] = True
-                if event.key == pygame.K_BACKSPACE:
-                    self.actions['moveJump'] = True
+                # if event.key == pygame.K_LEFT:
+                #     self.actions['moveLeft'] = True
+                # if event.key == pygame.K_RIGHT:
+                #     self.actions['moveRight'] = True
+                # if event.key == pygame.K_UP:
+                #     self.actions['moveUp'] = True
+                # if event.key == pygame.K_DOWN:
+                #     self.actions['moveDown'] = True
+                # if event.key == pygame.K_BACKSPACE:
+                #     self.actions['moveJump'] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -79,22 +79,30 @@ class Game(CommonFunc):
                 if mouse_click[2]:
                     self.actions['right'] = False
                 self.mouse_pos = pygame.mouse.get_pos()
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_ESCAPE:
-                    self.actions['pause'] = False   
-                if event.key == pygame.K_RETURN:
-                    self.actions['start'] = False
-                if event.key == pygame.K_LEFT:
-                    self.actions['moveLeft'] = False
-                if event.key == pygame.K_RIGHT:
-                    self.actions['moveRight'] = False
-                if event.key == pygame.K_UP:
-                    self.actions['moveUp'] = False
-                if event.key == pygame.K_DOWN:
-                    self.actions['moveDown'] = False
-                if event.key == pygame.K_BACKSPACE:
-                    self.actions['moveJump'] = False
-                self.mouse_pos = (0,0)
+            # if event.type == pygame.KEYUP:
+            #     if event.key == pygame.K_ESCAPE:
+            #         self.actions['pause'] = False   
+            #     if event.key == pygame.K_RETURN:
+            #         self.actions['start'] = False
+            #     if event.key == pygame.K_LEFT:
+            #         self.actions['moveLeft'] = False
+            #     if event.key == pygame.K_RIGHT:
+            #         self.actions['moveRight'] = False
+            #     if event.key == pygame.K_UP:
+            #         self.actions['moveUp'] = False
+            #     if event.key == pygame.K_DOWN:
+            #         self.actions['moveDown'] = False
+            #     if event.key == pygame.K_BACKSPACE:
+            #         self.actions['moveJump'] = False
+            #     self.mouse_pos = (0,0)
+
+        userInput = pygame.key.get_pressed()
+        if userInput[pygame.K_LEFT]:
+            self.actions["moveLeft"] = True
+        if userInput[pygame.K_RIGHT]:
+            self.actions["moveRight"] = True
+
+
 
     def update(self):
         self.state_stack[-1].update(self.actions, self.screen)

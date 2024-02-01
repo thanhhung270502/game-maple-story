@@ -1,8 +1,7 @@
+def change(a):
+    a[0] = 3
 
-def loadMap(name):
-    with open(name, 'rb') as f:
-        lines = f.readlines()
-    
-    print(lines)
-
-loadMap("../assets/map/map.txt")
+a = [5, 3]
+print("Before: ", a)
+change(a)
+print("After: ", a)

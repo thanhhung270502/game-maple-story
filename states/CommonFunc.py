@@ -14,12 +14,16 @@ class CommonFunc:
 
         self.RENDER_DRAW_COLOR = 255
 
-        self.BLANK_TILE = 0
+        self.BLANK_TILE = int(0)
         self.TILE_SIZE = 60
 
         self.MAX_MAP_X = 100
         self.MAX_MAP_Y = 12
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3, "jump": 4}
+        
+        self.GRAVITY_SPEED = 5
+        self.PLAYER_SPEED = 10
+        self.MAX_FALL_SPEED = 100
 
 class Input:
     def __init__(self) -> None:
