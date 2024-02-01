@@ -68,8 +68,8 @@ class Game(CommonFunc):
                 #     self.actions['moveUp'] = True
                 # if event.key == pygame.K_DOWN:
                 #     self.actions['moveDown'] = True
-                # if event.key == pygame.K_BACKSPACE:
-                #     self.actions['moveJump'] = True
+                if event.key == pygame.K_SPACE:
+                    self.actions['moveJump'] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -101,6 +101,9 @@ class Game(CommonFunc):
             self.actions["moveLeft"] = True
         if userInput[pygame.K_RIGHT]:
             self.actions["moveRight"] = True
+        # if userInput[pygame.K_SPACE]:
+        #     print("backspace")
+        #     self.actions['moveJump'] = True
 
 
 

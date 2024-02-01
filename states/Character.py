@@ -57,9 +57,7 @@ class Character(State, CommonFunc):
     
     def handleInputAction(self, actions):
         if actions["moveLeft"]:
-            print("Left")
             self.status_ = self.move["left"]
-            print(self.status_)
             self.input_type_.left_ = 1
             self.input_type_.right_ = 0
             self.input_type_.up_ = 0
@@ -67,9 +65,7 @@ class Character(State, CommonFunc):
             
             self.input_type_.prevStep_ = self.move["left"]
         elif actions["moveRight"]:
-            print("Right")
             self.status_ = self.move["right"]
-            print(self.status_)
             self.input_type_.left_ = 0
             self.input_type_.right_ = 1
             self.input_type_.up_ = 0
@@ -81,6 +77,12 @@ class Character(State, CommonFunc):
             self.input_type_.right_ = 0
             self.input_type_.up_ = 0
             self.input_type_.down_ = 0
+        
+        if actions["moveJump"]:
+            self.status_ = self.move["jump"]
+            self.input_type_.jump_ = 1
+        else:
+            self.input_type_.jump_ = 0
     
     def doPlayer(self, map_data: [Map]):
         self.x_val_= 0
@@ -93,6 +95,12 @@ class Character(State, CommonFunc):
             self.x_val_ -= self.PLAYER_SPEED
         elif self.input_type_.right_ == 1:
             self.x_val_ += self.PLAYER_SPEED
+        if self.input_type_.jump_ == 1:
+            print(self.on_ground_)
+            if (self.on_ground_ == True):
+                self.y_val_ = -self.PLAYER_JUMP
+                self.input_type_.jump_ = 0
+                self.on_ground_ = False
         
         self.checkToMap(map_data)
         
@@ -108,7 +116,12 @@ class Character(State, CommonFunc):
         y1 = int((self.y_pos_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + height_min - 1) / self.TILE_SIZE)
         
-        if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
+        if x1 < 0 or x2 >= self.MAX_MAP_X:
+            self.x_val_ = 0
+        elif y1 < 0 or y2 >= self.MAX_MAP_Y:
+            self.y_val_ = 0
+        
+        elif x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
             if self.x_val_ > 0:
                 if map_data[0].tile[y1][x2] > self.BLANK_TILE or \
                     map_data[0].tile[y2][x2] > self.BLANK_TILE:
@@ -136,10 +149,13 @@ class Character(State, CommonFunc):
                     self.y_pos_ = y2 * self.TILE_SIZE
                     self.y_pos_ -= self.CHARACTER_HEIGHT + 1
                     self.y_val_ = 0
+                    self.on_ground_ = True
             elif self.y_val_ < 0:
                 if int(map_data[0].tile[y1][x1]) > int(self.BLANK_TILE) or int(map_data[0].tile[y1][x2]) > int(self.BLANK_TILE):
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.y_val_ = 0
+                    self.on_ground_ = False
+        
         
         self.x_pos_ += self.x_val_
         self.y_pos_ += self.y_val_

@@ -6,7 +6,7 @@ class CommonFunc:
         self.CHARACTER_HEIGHT = 70
         self.SCREEN_BPP = 32
         
-        self.NUM_OF_FRAME = 4
+        self.NUM_OF_FRAME = 8
 
         self.COLOR_KEY_R = 167
         self.COLOR_KEY_G = 175
@@ -17,13 +17,16 @@ class CommonFunc:
         self.BLANK_TILE = int(0)
         self.TILE_SIZE = 60
 
-        self.MAX_MAP_X = 100
+        self.MAX_MAP_X = 25
         self.MAX_MAP_Y = 12
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3, "jump": 4}
         
-        self.GRAVITY_SPEED = 5
-        self.PLAYER_SPEED = 10
-        self.MAX_FALL_SPEED = 100
+        self.GRAVITY_SPEED = 10
+        self.PLAYER_SPEED = 8
+        self.MAX_FALL_SPEED = 30
+        self.PLAYER_JUMP = 37
+        
+        self.FRAME_PER_SECOND = 45      # fps
 
 class Input:
     def __init__(self) -> None:

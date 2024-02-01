@@ -4,15 +4,15 @@ from states.Result import Result
 from RWFile import HandleFile
 from states.CommonFunc import *
 from states.Character import Character
+from states.ImpTimer import ImpTimer
 import random
 import json
 # from states.PauseMenu import PauseMenu
 
-class Playground(State):
+class Playground(State, CommonFunc):
     def __init__(self, game, level, weapon):
         State.__init__(self,game)
-        self.SCREEN_WIDTH = 1280
-        self.SCREEN_HEIGHT = 720
+        CommonFunc.__init__(self)
         self.COLORWHITE = (255, 255, 255)
         
         self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "Henesys.png"))
@@ -26,12 +26,14 @@ class Playground(State):
         self.game_map = GameMap(game)
         
         self.p_player = Character(game)
+        self.fps_timer = ImpTimer()
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
         # if actions["pause"]:
         #     new_state = PauseMenu(self.game)
         #     new_state.enter_state()
+        self.fps_timer.start()
         self.p_player.handleInputAction(actions)
         
         self.game.reset_keys()
@@ -48,7 +50,15 @@ class Playground(State):
         self.p_player.show(display)
         
         self.game_map.drawMap(display)
-        pygame.time.delay(10)
+        
+        real_imp_time = self.fps_timer.get_ticks()
+        time_one_frame = 1000 / self.FRAME_PER_SECOND
+        
+        if (real_imp_time < time_one_frame):
+            delay_time = time_one_frame - real_imp_time
+            if delay_time > 0:
+                pygame.time.delay(int(delay_time + 50))
+        # pygame.time.delay(30)
         
 
 
@@ -102,10 +112,11 @@ class GameMap (State, CommonFunc):
             while(j < x2):
                 val = int(self.game_map_[0].tile[map_y][map_x])
                 if val > 0:
-                    imageName = str(val) + ".png"
-                    image = pygame.image.load(os.path.join(self.game.map_dir, imageName))
-                    imagePos = (j, i)
-                    display.blit(image, imagePos)
+                    if val < 5: 
+                        imageName = str(val) + ".png"
+                        image = pygame.image.load(os.path.join(self.game.map_dir, imageName))
+                        imagePos = (j, i)
+                        display.blit(image, imagePos)
                 map_x += 1
                 j += self.TILE_SIZE
             map_y += 1
