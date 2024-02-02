@@ -51,6 +51,8 @@ class Playground(State, CommonFunc):
         
         self.game_map.drawMap(display)
         
+        self.p_player.handleBullet(display)
+        
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND
         

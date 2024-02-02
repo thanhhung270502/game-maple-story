@@ -1,6 +1,7 @@
 import pygame, os
 from states.CommonFunc import *
 from states.State import State
+from states.Bullet import Bullet
 
 class Character(State, CommonFunc):
     def __init__(self, game):
@@ -15,11 +16,6 @@ class Character(State, CommonFunc):
         
         self.frame_clip_ = []
 
-        # for i in range(self.NUM_OF_FRAME): 
-        #     imageName = "move"
-        #     image = pygame.image.load(os.path.join(self.game.char_dir, "moveRight.png"))
-        #     self.frame_clip_.append()
-
         self.input_type_ = Input()
         
         self.frame_ = 0
@@ -29,18 +25,9 @@ class Character(State, CommonFunc):
         
         self.imageName = "moveRight"
         
-    def show(self, display):
-        # if self.status_ == self.move["right"]:
-        #     self.imageName = "moveRight"
-        # elif self.status_ == self.move["left"]:
-        #     self.imageName = "moveLeft"
-        # # Jump ...
+        self.bullet_list_: [Bullet] = []
         
-        # else:
-        #     if self.input_type_.prevStep_ == self.move["right"]:
-        #         self.imageName = "moveRight"
-        #     elif self.input_type_.prevStep_ == self.move["left"]:
-        #         self.imageName = "moveLeft"
+    def show(self, display):
         self.updateImagePlayer()
         
         # When moving, this frame will increase
@@ -55,7 +42,7 @@ class Character(State, CommonFunc):
         imageName = self.imageName + str(self.frame_) + ".png"
         image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
         display.blit(image, (self.x_pos_, self.y_pos_))
-        
+
     def updateImagePlayer(self):
         if self.on_ground_:
             if self.status_ == self.move["left"]:
@@ -67,9 +54,7 @@ class Character(State, CommonFunc):
                 self.imageName = "jumpLeft"
             else:
                 self.imageName = "jumpRight"
-            
-            
-    
+
     def handleInputAction(self, actions):
         if actions["moveLeft"]:
             self.status_ = self.move["left"]
@@ -98,6 +83,26 @@ class Character(State, CommonFunc):
             self.input_type_.jump_ = 1
         else:
             self.input_type_.jump_ = 0
+            
+        if actions["normalAttack"]:
+            # if self.status_ == self.move["left"] or self.status_ == self.move["right"]:
+                
+            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_)
+            bullet.is_move_ = True
+            self.bullet_list_.append(bullet)
+
+    def handleBullet(self, display):
+        length = len(self.bullet_list_)
+        i = 0
+        while(i < length):
+            if self.bullet_list_[i].is_move_:
+                self.bullet_list_[i].handleMove(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+                image = pygame.image.load(os.path.join(self.game.bullet_dir, "phitieu1.png"))
+                display.blit(image, (self.bullet_list_[i].x_pos_, self.bullet_list_[i].y_pos_))
+                i += 1
+            else:
+                self.bullet_list_.pop(i)
+                length -= 1
 
     def doPlayer(self, map_data: [Map]):
         self.x_val_= 0
@@ -117,7 +122,7 @@ class Character(State, CommonFunc):
                 self.on_ground_ = False
         
         self.checkToMap(map_data)
-        
+
     def checkToMap(self, map_data: [Map]):
         x1, x2, y1, y2 = 0, 0, 0, 0
         

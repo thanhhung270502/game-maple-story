@@ -19,10 +19,11 @@ class CommonFunc:
 
         self.MAX_MAP_X = 25
         self.MAX_MAP_Y = 12
-        self.move = {"right": 0, "left": 1, "up": 2, "down": 3, "jump": 4}
+        self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
+        self.BULLET_SPEED = 16
         self.MAX_FALL_SPEED = 30
         self.PLAYER_JUMP = 37
         

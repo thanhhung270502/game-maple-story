@@ -24,7 +24,7 @@ class Game(CommonFunc):
         self.running, self.playing = True, True
         self.actions = {"left": False, "right": False, "pause" : False, "start" : False, 
                         "moveLeft": False, "moveRight": False, "moveUp": False, "moveDown": False,
-                        "moveJump": False}
+                        "moveJump": False, "normalAttack": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
@@ -60,14 +60,8 @@ class Game(CommonFunc):
                     self.actions['pause'] = True
                 if event.key == pygame.K_RETURN:
                     self.actions['start'] = True
-                # if event.key == pygame.K_LEFT:
-                #     self.actions['moveLeft'] = True
-                # if event.key == pygame.K_RIGHT:
-                #     self.actions['moveRight'] = True
-                # if event.key == pygame.K_UP:
-                #     self.actions['moveUp'] = True
-                # if event.key == pygame.K_DOWN:
-                #     self.actions['moveDown'] = True
+                if event.key == pygame.K_LCTRL:
+                    self.actions['normalAttack'] = True
                 if event.key == pygame.K_SPACE:
                     self.actions['moveJump'] = True
                 self.mouse_pos = (0,0)
@@ -133,6 +127,7 @@ class Game(CommonFunc):
         self.assets_dir = os.path.join("./assets")
         self.map_dir = os.path.join(self.assets_dir, "map")
         self.char_dir = os.path.join(self.assets_dir, "characters")
+        self.bullet_dir = os.path.join(self.assets_dir, "bullet")
         self.background_dir = os.path.join(self.assets_dir, "background")
         self.sprite_dir = os.path.join(self.assets_dir, "sprites")
         self.font_dir = os.path.join(self.assets_dir, "fonts")
