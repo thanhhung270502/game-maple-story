@@ -31,6 +31,8 @@ class ThreatsObject(State, CommonFunc):
         self.animation_b_ = 0
         self.input_type_ = Input()
         self.input_type_.left_ = 1
+        
+        self.startTimeToStuck = -1
 
     def initial(self):
         self.x_val_ = 0
@@ -107,6 +109,20 @@ class ThreatsObject(State, CommonFunc):
                     self.x_pos_ = x2 * self.TILE_SIZE
                     self.x_pos_ -= self.MONSTER_WIDTH + 1
                     self.x_val_ = 0
+                    
+                    if self.startTimeToStuck == -1:
+                        self.startTimeToStuck = pygame.time.get_ticks()
+                    
+                    if (pygame.time.get_ticks() - self.startTimeToStuck) > 4000:
+                        if self.input_type_.left_ == 1:
+                            self.input_type_.right_ = 1
+                            self.input_type_.left_ = 0
+                            self.imageName = "right_squid"
+                        elif self.input_type_.right_ == 1:
+                            self.input_type_.left_ = 1
+                            self.input_type_.right_ = 0
+                            self.imageName = "left_squid"
+                        self.startTimeToStuck = -1
             elif self.x_val_ < 0:
                 value_1 = map_data[0].tile[y1][x1]
                 value_2 = map_data[0].tile[y2][x1]
@@ -114,6 +130,19 @@ class ThreatsObject(State, CommonFunc):
                     value_2 > self.BLANK_TILE:
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.x_val_ = 0
+                if self.startTimeToStuck == -1:
+                    self.startTimeToStuck = pygame.time.get_ticks()
+                
+                if (pygame.time.get_ticks() - self.startTimeToStuck) > 4000:
+                    if self.input_type_.left_ == 1:
+                        self.input_type_.right_ = 1
+                        self.input_type_.left_ = 0
+                        self.imageName = "right_squid"
+                    elif self.input_type_.right_ == 1:
+                        self.input_type_.left_ = 1
+                        self.input_type_.right_ = 0
+                        self.imageName = "left_squid"
+                    self.startTimeToStuck = -1
         
         # Check vertical position
         width_min = self.MONSTER_WIDTH if self.MONSTER_WIDTH < self.TILE_SIZE else self.TILE_SIZE
