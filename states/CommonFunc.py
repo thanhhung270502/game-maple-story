@@ -17,7 +17,7 @@ class CommonFunc:
         self.BLANK_TILE = int(0)
         self.TILE_SIZE = 60
 
-        self.MAX_MAP_X = 25
+        self.MAX_MAP_X = 100
         self.MAX_MAP_Y = 12
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
@@ -40,8 +40,8 @@ class Input:
 
 class Map:
     def __init__(self):
-        self.start_x_ = 0
-        self.start_y_ = 0
+        self.start_x_ = [0]
+        self.start_y_ = [0]
         
         self.max_x_ = 0
         self.max_y_ = 0

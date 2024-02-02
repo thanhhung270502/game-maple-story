@@ -8,11 +8,14 @@ class Character(State, CommonFunc):
         State.__init__(self, game)
         CommonFunc.__init__(self)
         
-        self.x_val_ = 0.0
-        self.y_val_ = 0.0
+        self.x_val_ = 0
+        self.y_val_ = 0
         
-        self.x_pos_ = 0.0
-        self.y_pos_ = 0.0
+        self.x_pos_ = 0
+        self.y_pos_ = 0
+        
+        self.map_x_ = [0]
+        self.map_y_ = [0]
         
         self.frame_clip_ = []
 
@@ -26,6 +29,10 @@ class Character(State, CommonFunc):
         self.imageName = "moveRight"
         
         self.bullet_list_: [Bullet] = []
+    
+    def setMapXY(self, x, y):
+        self.map_x_[0] = x
+        self.map_y_[0] = y
         
     def show(self, display):
         self.updateImagePlayer()
@@ -38,10 +45,14 @@ class Character(State, CommonFunc):
             
         if self.frame_ >= self.NUM_OF_FRAME:
             self.frame_ = 0
+            
+        # self.x_pos_ -= self.map_x_
+        # self.y_pos_ -= self.map_y_
+        # print(self.x_pos_, self.map_x_)
         
         imageName = self.imageName + str(self.frame_) + ".png"
         image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
-        display.blit(image, (self.x_pos_, self.y_pos_))
+        display.blit(image, (self.x_pos_ - self.map_x_[0], self.y_pos_ - self.map_y_[0]))
 
     def updateImagePlayer(self):
         if self.on_ground_:
@@ -122,6 +133,20 @@ class Character(State, CommonFunc):
                 self.on_ground_ = False
         
         self.checkToMap(map_data)
+        self.centerCharacterOnMap(map_data)
+
+    def centerCharacterOnMap(self, map_data: [Map]):
+        map_data[0].start_x_[0] = self.x_pos_ - (self.SCREEN_WIDTH / 2)
+        if map_data[0].start_x_[0] < 0:
+            map_data[0].start_x_[0] = 0
+        elif (map_data[0].start_x_[0] + self.SCREEN_WIDTH >= map_data[0].max_x_):
+            map_data[0].start_x_[0] = map_data[0].max_x_ - self.SCREEN_WIDTH
+        
+        # map_data[0].start_y_[0] = self.y_pos_ - (self.SCREEN_HEIGHT / 2)
+        # if map_data[0].start_y_[0] < 0:
+        #     map_data[0].start_y_[0] = 0
+        # elif (map_data[0].start_y_[0] + self.SCREEN_HEIGHT >= map_data[0].max_y_ * 2):
+        #     map_data[0].start_y_[0] = map_data[0].max_y_ - self.SCREEN_HEIGHT
 
     def checkToMap(self, map_data: [Map]):
         x1, x2, y1, y2 = 0, 0, 0, 0
@@ -135,12 +160,15 @@ class Character(State, CommonFunc):
         y1 = int((self.y_pos_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + height_min - 1) / self.TILE_SIZE)
         
-        if x1 < 0 or x2 >= self.MAX_MAP_X:
-            self.x_val_ = 0
-        elif y1 < 0 or y2 >= self.MAX_MAP_Y:
-            self.y_val_ = 0
+        # print("x1 = ", x1, " y1 = ", y1)
+        # print("x2 = ", x2, " y2 = ", y2)
         
-        elif x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
+        # if x1 < 0 or x2 >= self.MAX_MAP_X:
+        #     self.x_val_ = 0
+        # elif y1 < 0 or y2 >= self.MAX_MAP_Y:
+        #     self.y_val_ = 0
+        
+        if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
             if self.x_val_ > 0:
                 if map_data[0].tile[y1][x2] > self.BLANK_TILE or \
                     map_data[0].tile[y2][x2] > self.BLANK_TILE:
