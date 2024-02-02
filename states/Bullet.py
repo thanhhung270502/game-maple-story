@@ -11,6 +11,10 @@ class Bullet(CommonFunc, State):
         self.y_pos_ = y_pos
         self.x_val_ = self.BULLET_SPEED
         self.y_val_ = 0
+        
+        self.map_x_ = [0]
+        self.map_y_ = [0]
+        
         self.is_move_ = False 
         self.bullet_dir_ = bullet_dir
         
@@ -24,3 +28,7 @@ class Bullet(CommonFunc, State):
             self.x_pos_ -= self.x_val_
             if self.x_pos_ < 0:
                 self.is_move_ = False
+                
+    def setMapXY(self, x, y):
+        self.map_x_[0] = x
+        self.map_y_[0] = y

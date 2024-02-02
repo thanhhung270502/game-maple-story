@@ -107,9 +107,13 @@ class Character(State, CommonFunc):
         i = 0
         while(i < length):
             if self.bullet_list_[i].is_move_:
-                self.bullet_list_[i].handleMove(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+                self.bullet_list_[i].handleMove(self.x_pos_ + self.DISTANCE_OF_BULLET, self.SCREEN_HEIGHT)
                 image = pygame.image.load(os.path.join(self.game.bullet_dir, "phitieu1.png"))
-                display.blit(image, (self.bullet_list_[i].x_pos_, self.bullet_list_[i].y_pos_))
+                
+                rect_x = self.bullet_list_[i].x_pos_ - self.map_x_[0]
+                rect_y = self.bullet_list_[i].y_pos_ - self.map_y_[0]
+                
+                display.blit(image, (rect_x, rect_y))
                 i += 1
             else:
                 self.bullet_list_.pop(i)
@@ -160,24 +164,20 @@ class Character(State, CommonFunc):
         y1 = int((self.y_pos_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + height_min - 1) / self.TILE_SIZE)
         
-        # print("x1 = ", x1, " y1 = ", y1)
-        # print("x2 = ", x2, " y2 = ", y2)
-        
-        # if x1 < 0 or x2 >= self.MAX_MAP_X:
-        #     self.x_val_ = 0
-        # elif y1 < 0 or y2 >= self.MAX_MAP_Y:
-        #     self.y_val_ = 0
-        
         if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
             if self.x_val_ > 0:
-                if map_data[0].tile[y1][x2] > self.BLANK_TILE or \
-                    map_data[0].tile[y2][x2] > self.BLANK_TILE:
+                value_1 = map_data[0].tile[y1][x2]
+                value_2 = map_data[0].tile[y2][x2]
+                if value_1 > self.BLANK_TILE or \
+                    value_2 > self.BLANK_TILE:
                     self.x_pos_ = x2 * self.TILE_SIZE
                     self.x_pos_ -= self.CHARACTER_WIDTH + 1
                     self.x_val_ = 0
             elif self.x_val_ < 0:
-                if map_data[0].tile[y1][x1] > self.BLANK_TILE or \
-                    map_data[0].tile[y2][x1] > self.BLANK_TILE:
+                value_1 = map_data[0].tile[y1][x1]
+                value_2 = map_data[0].tile[y2][x1]
+                if value_1 > self.BLANK_TILE or \
+                    value_2 > self.BLANK_TILE:
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.x_val_ = 0
         
@@ -192,13 +192,17 @@ class Character(State, CommonFunc):
         
         if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
             if self.y_val_ > 0:
-                if int(map_data[0].tile[y2][x1]) > int(self.BLANK_TILE) or int(map_data[0].tile[y2][x2]) > int(self.BLANK_TILE):
+                value_1 = map_data[0].tile[y2][x1]
+                value_2 = map_data[0].tile[y2][x2]
+                if value_1 > self.BLANK_TILE or value_2 > self.BLANK_TILE:
                     self.y_pos_ = y2 * self.TILE_SIZE
                     self.y_pos_ -= self.CHARACTER_HEIGHT + 1
                     self.y_val_ = 0
                     self.on_ground_ = True
             elif self.y_val_ < 0:
-                if int(map_data[0].tile[y1][x1]) > int(self.BLANK_TILE) or int(map_data[0].tile[y1][x2]) > int(self.BLANK_TILE):
+                value_1 = map_data[0].tile[y1][x1]
+                value_2 = map_data[0].tile[y1][x2]
+                if value_1 > self.BLANK_TILE or value_2 > self.BLANK_TILE:
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.y_val_ = 0
                     self.on_ground_ = False

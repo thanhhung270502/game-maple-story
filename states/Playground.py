@@ -4,6 +4,7 @@ from states.Result import Result
 from RWFile import HandleFile
 from states.CommonFunc import *
 from states.Character import Character
+from states.ThreatsObject import ThreatsObject
 from states.ImpTimer import ImpTimer
 import random
 import json
@@ -27,6 +28,31 @@ class Playground(State, CommonFunc):
         
         self.p_player = Character(game)
         self.fps_timer = ImpTimer()
+        
+        # self.threats_list: [ThreatsObject] = []
+        
+            
+        self.dynamic_threats_list: [ThreatsObject] = self.makeThreatsList()
+        
+    def makeThreatsList(self):
+        dynamic_threats_list: [ThreatsObject] = []
+        
+        for i in range(10):
+            p_threat = ThreatsObject(self.game, 500 + i * 500, 200) 
+            p_threat.animation_a_ = p_threat.x_pos_ - 200
+            p_threat.animation_b_ = p_threat.x_pos_ + 200
+            p_threat.type_move_ = self.type_move["move_in_space_threat"]
+            # print(p_threat.animation_a_, p_threat.x_pos_)
+            p_threat.input_type_.left_ = 1
+            dynamic_threats_list.append(p_threat)
+        
+        for i in range(10):
+            p_threat = ThreatsObject(self.game, 700 + i * 1200, 200)
+            p_threat.type_move_ = self.type_move["static_threat"]
+            p_threat.input_type_.left_ = 0
+            dynamic_threats_list.append(p_threat)
+            
+        return dynamic_threats_list
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
@@ -54,6 +80,12 @@ class Playground(State, CommonFunc):
         self.game_map.setMap(map_data)
         self.game_map.drawMap(display)
         
+        for i in range(len(self.dynamic_threats_list)):
+            self.dynamic_threats_list[i].impMoveType()
+            self.dynamic_threats_list[i].doPlayer(map_data)
+            self.dynamic_threats_list[i].setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
+            self.dynamic_threats_list[i].show(display)
+        
         self.p_player.handleBullet(display)
         
         real_imp_time = self.fps_timer.get_ticks()
@@ -65,8 +97,6 @@ class Playground(State, CommonFunc):
                 pygame.time.delay(int(delay_time + 50))
         # pygame.time.delay(30)
         
-
-
 
 class GameMap (State, CommonFunc):
     def __init__(self, game):

@@ -2,8 +2,13 @@ class CommonFunc:
     def __init__(self):
         self.SCREEN_WIDTH = 1500
         self.SCREEN_HEIGHT = 720
+        
         self.CHARACTER_WIDTH = 70
         self.CHARACTER_HEIGHT = 70
+        
+        self.MONSTER_WIDTH = 60
+        self.MONSTER_HEIGHT = 105
+        
         self.SCREEN_BPP = 32
         
         self.NUM_OF_FRAME = 8
@@ -21,11 +26,15 @@ class CommonFunc:
         self.MAX_MAP_Y = 12
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
+        self.type_move = {"static_threat": 0, "move_in_space_threat": 1}
+        
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
+        self.MONSTER_SPEED = 4
         self.BULLET_SPEED = 16
         self.MAX_FALL_SPEED = 30
         self.PLAYER_JUMP = 37
+        self.DISTANCE_OF_BULLET = 400
         
         self.FRAME_PER_SECOND = 45      # fps
 

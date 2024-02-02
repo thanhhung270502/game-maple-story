@@ -127,6 +127,7 @@ class Game(CommonFunc):
         self.assets_dir = os.path.join("./assets")
         self.map_dir = os.path.join(self.assets_dir, "map")
         self.char_dir = os.path.join(self.assets_dir, "characters")
+        self.monster_dir = os.path.join(self.assets_dir, "monster")
         self.bullet_dir = os.path.join(self.assets_dir, "bullet")
         self.background_dir = os.path.join(self.assets_dir, "background")
         self.sprite_dir = os.path.join(self.assets_dir, "sprites")
