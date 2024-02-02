@@ -30,17 +30,18 @@ class Character(State, CommonFunc):
         self.imageName = "moveRight"
         
     def show(self, display):
-        if self.status_ == self.move["right"]:
-            self.imageName = "moveRight"
-        elif self.status_ == self.move["left"]:
-            self.imageName = "moveLeft"
-        # Jump ...
+        # if self.status_ == self.move["right"]:
+        #     self.imageName = "moveRight"
+        # elif self.status_ == self.move["left"]:
+        #     self.imageName = "moveLeft"
+        # # Jump ...
         
-        else:
-            if self.input_type_.prevStep_ == self.move["right"]:
-                self.imageName = "moveRight"
-            elif self.input_type_.prevStep_ == self.move["left"]:
-                self.imageName = "moveLeft"
+        # else:
+        #     if self.input_type_.prevStep_ == self.move["right"]:
+        #         self.imageName = "moveRight"
+        #     elif self.input_type_.prevStep_ == self.move["left"]:
+        #         self.imageName = "moveLeft"
+        self.updateImagePlayer()
         
         # When moving, this frame will increase
         if self.input_type_.left_ == 1 or self.input_type_.right_ == 1:
@@ -54,6 +55,20 @@ class Character(State, CommonFunc):
         imageName = self.imageName + str(self.frame_) + ".png"
         image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
         display.blit(image, (self.x_pos_, self.y_pos_))
+        
+    def updateImagePlayer(self):
+        if self.on_ground_:
+            if self.status_ == self.move["left"]:
+                self.imageName = "moveLeft"
+            else:
+                self.imageName = "moveRight"
+        else:
+            if self.status_ == self.move["left"]:
+                self.imageName = "jumpLeft"
+            else:
+                self.imageName = "jumpRight"
+            
+            
     
     def handleInputAction(self, actions):
         if actions["moveLeft"]:
@@ -63,7 +78,7 @@ class Character(State, CommonFunc):
             self.input_type_.up_ = 0
             self.input_type_.down_ = 0
             
-            self.input_type_.prevStep_ = self.move["left"]
+            # self.input_type_.prevStep_ = self.move["left"]
         elif actions["moveRight"]:
             self.status_ = self.move["right"]
             self.input_type_.left_ = 0
@@ -71,19 +86,19 @@ class Character(State, CommonFunc):
             self.input_type_.up_ = 0
             self.input_type_.down_ = 0
             
-            self.input_type_.prevStep_ = self.move["right"]
+            # self.input_type_.prevStep_ = self.move["right"]
         else:
             self.input_type_.left_ = 0
             self.input_type_.right_ = 0
             self.input_type_.up_ = 0
             self.input_type_.down_ = 0
-        
+
         if actions["moveJump"]:
-            self.status_ = self.move["jump"]
+            # self.status_ = self.move["jump"]
             self.input_type_.jump_ = 1
         else:
             self.input_type_.jump_ = 0
-    
+
     def doPlayer(self, map_data: [Map]):
         self.x_val_= 0
         self.y_val_ += self.GRAVITY_SPEED
@@ -96,7 +111,6 @@ class Character(State, CommonFunc):
         elif self.input_type_.right_ == 1:
             self.x_val_ += self.PLAYER_SPEED
         if self.input_type_.jump_ == 1:
-            print(self.on_ground_)
             if (self.on_ground_ == True):
                 self.y_val_ = -self.PLAYER_JUMP
                 self.input_type_.jump_ = 0
