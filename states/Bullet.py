@@ -15,6 +15,9 @@ class Bullet(CommonFunc, State):
         self.map_x_ = [0]
         self.map_y_ = [0]
         
+        self.width_frame_ = 25
+        self.height_frame_ = 25
+        
         self.is_move_ = False 
         self.bullet_dir_ = bullet_dir
         

@@ -1,4 +1,13 @@
-class CommonFunc:
+class Rect:
+    def __init__(self, x, y, w, h):
+        self.x, self.y = x, y
+        self.w, self.h = w, h
+        
+    def print_rect(self):
+        print("x: ", self.x, "; y: ", self.y)
+        print("w: ", self.w, "; h: ", self.h)
+
+class CommonFunc():
     def __init__(self):
         self.SCREEN_WIDTH = 1500
         self.SCREEN_HEIGHT = 720
@@ -37,6 +46,55 @@ class CommonFunc:
         self.DISTANCE_OF_BULLET = 400
         
         self.FRAME_PER_SECOND = 45      # fps
+        
+    def checkCollision(object1: Rect, object2: Rect):
+        left_a = object1.x
+        right_a = object1.x + object1.w
+        top_a = object1.y
+        bottom_a = object1.y + object1.h
+        
+        left_b = object2.x
+        right_b = object2.x + object2.w
+        top_b = object2.y
+        bottom_b = object2.y + object2.h
+
+        # Case 1: size object 1 < size object 2
+        if (left_a > left_b and left_a < right_b):
+            if (top_a > top_b and top_a < bottom_b):
+                return True
+        
+            if (bottom_a > top_b and bottom_a < bottom_b):
+                return True
+        
+        if (right_a > left_b and right_a < right_b):
+            if (top_a > top_b and top_a < bottom_b):
+                return True
+        
+            if (bottom_a > top_b and bottom_a < bottom_b):
+                return True
+        
+        # Case 2: size object 1 < size object 2
+        if (left_b > left_a and left_b < right_a):
+            if (top_b > top_a and top_b < bottom_a):
+                return True
+        
+        if (left_b > left_a and left_b < right_a):
+            if (bottom_b > top_a and bottom_b < bottom_a):
+                return True
+
+        if (right_b > left_a and right_b < right_a):
+            if (top_b > top_a and top_b < bottom_a):
+                return True
+        
+        if (right_b > left_a and right_b < right_a):
+            if (bottom_b > top_a and bottom_b < bottom_a):
+                return True
+        
+        # Case 3: size object 1 = size object 2
+        if (top_a == top_b and right_a == right_b and bottom_a == bottom_b):
+            return True
+        
+        return False
 
 class Input:
     def __init__(self) -> None:
@@ -58,7 +116,3 @@ class Map:
         self.tile = []
         self.fileName = ""
         
-class Rect:
-    def __init__(self, x, y, w, h):
-        self.x, self.y = x, y
-        self.w, self.h = w, h

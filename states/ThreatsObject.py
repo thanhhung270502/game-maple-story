@@ -21,8 +21,8 @@ class ThreatsObject(State, CommonFunc):
         self.frame_clip_ = []
         self.frame_ = 0
         
-        self.width_frame_ = 0
-        self.height_frame_ = 0
+        self.width_frame_ = 60
+        self.height_frame_ = 105
         
         self.imageName = "left_squid"
         
@@ -96,8 +96,6 @@ class ThreatsObject(State, CommonFunc):
         
         y1 = int((self.y_pos_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + height_min - 1) / self.TILE_SIZE)
-        
-        print("x1: ", x1, "; x2: ", x2)
         
         if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
             if self.x_val_ > 0:

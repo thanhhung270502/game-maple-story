@@ -38,19 +38,18 @@ class Playground(State, CommonFunc):
         dynamic_threats_list: [ThreatsObject] = []
         
         for i in range(10):
-            p_threat = ThreatsObject(self.game, 500 + i * 500, 200) 
+            p_threat = ThreatsObject(self.game, 500 + i * 300, 200) 
             p_threat.animation_a_ = p_threat.x_pos_ - 200
             p_threat.animation_b_ = p_threat.x_pos_ + 200
             p_threat.type_move_ = self.type_move["move_in_space_threat"]
-            # print(p_threat.animation_a_, p_threat.x_pos_)
             p_threat.input_type_.left_ = 1
             dynamic_threats_list.append(p_threat)
         
-        for i in range(10):
-            p_threat = ThreatsObject(self.game, 700 + i * 1200, 200)
-            p_threat.type_move_ = self.type_move["static_threat"]
-            p_threat.input_type_.left_ = 0
-            dynamic_threats_list.append(p_threat)
+        # for i in range(10):
+        #     p_threat = ThreatsObject(self.game, 700 + i * 1200, 200)
+        #     p_threat.type_move_ = self.type_move["static_threat"]
+        #     p_threat.input_type_.left_ = 0
+        #     dynamic_threats_list.append(p_threat)
             
         return dynamic_threats_list
 
@@ -64,6 +63,25 @@ class Playground(State, CommonFunc):
         
         self.game.reset_keys()
         pass
+
+    def removeMonster(self, index):
+        size = len(self.dynamic_threats_list)
+        if size > 0 and index < size:
+            self.dynamic_threats_list.pop(index)
+        return self.dynamic_threats_list
+    
+    def handleCollision(self):
+        i = 0
+        j = 0
+        for i in range(len(self.p_player.bullet_list_)):
+            for j in range(len(self.dynamic_threats_list)):
+                object1 = Rect(self.p_player.bullet_list_[i].x_pos_, self.p_player.bullet_list_[i].y_pos_, self.p_player.bullet_list_[i].width_frame_, self.p_player.bullet_list_[i].height_frame_)
+                object2 = Rect(self.dynamic_threats_list[j].x_pos_, self.dynamic_threats_list[j].y_pos_, self.dynamic_threats_list[j].width_frame_, self.dynamic_threats_list[j].height_frame_)
+
+                if CommonFunc.checkCollision(object1, object2):
+                    self.p_player.bullet_list_ = self.p_player.removeBullet(i)
+                    self.dynamic_threats_list = self.removeMonster(j)
+                    return
 
     def render(self, display):
         display.blit(self.img_background, (0,0))
@@ -87,6 +105,9 @@ class Playground(State, CommonFunc):
             self.dynamic_threats_list[i].show(display)
         
         self.p_player.handleBullet(display)
+        
+        self.handleCollision()
+                
         
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND

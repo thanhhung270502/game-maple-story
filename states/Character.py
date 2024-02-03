@@ -119,6 +119,13 @@ class Character(State, CommonFunc):
                 self.bullet_list_.pop(i)
                 length -= 1
 
+    def removeBullet(self, index):
+        size = len(self.bullet_list_)
+        if size > 0 and index < size:
+            self.bullet_list_.pop(index)
+            
+        return self.bullet_list_
+
     def doPlayer(self, map_data: [Map]):
         self.x_val_= 0
         self.y_val_ += self.GRAVITY_SPEED
