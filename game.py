@@ -99,8 +99,6 @@ class Game(CommonFunc):
         #     print("backspace")
         #     self.actions['moveJump'] = True
 
-
-
     def update(self):
         self.state_stack[-1].update(self.actions, self.screen)
 
@@ -149,6 +147,7 @@ class Game(CommonFunc):
 
     def load_sounds(self):
         self.background_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "henesys.mp3"))
+        self.loginBackground_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "login.mp3"))
 
         self.play_pickup_sound = True
         self.pickup_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "pickup.wav"))
@@ -157,7 +156,7 @@ class Game(CommonFunc):
         self.explosion_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "explosion.wav"))
         self.wrong_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "wrong.mp3"))
 
-        self.background_sound.play(loops=-1)
+        self.loginBackground_sound.play(loops=-1)
 
 
 if __name__ == "__main__":

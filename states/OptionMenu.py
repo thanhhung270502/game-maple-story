@@ -75,6 +75,8 @@ class OptionMenu(State):
             self.weapon_bg_hover = None
         
         if actions["start"] or actions["left"] and self.start_game_box.collidepoint(pygame.mouse.get_pos()):
+            self.game.loginBackground_sound.stop()
+            self.game.background_sound.play(loops = -1)
             newState = Playground(self.game, self.level_bg, self.weapon_bg)
             newState.enter_state()
         elif self.start_game_box.collidepoint(pygame.mouse.get_pos()):
