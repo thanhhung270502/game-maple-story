@@ -3,7 +3,7 @@ from states.CommonFunc import *
 from states.State import State
 
 class ThreatsObject(State, CommonFunc):
-    def __init__(self, game, x_pos, y_pos):
+    def __init__(self, game, x_pos, y_pos, monster):
         State.__init__(self, game)
         CommonFunc.__init__(self)
         
@@ -24,7 +24,12 @@ class ThreatsObject(State, CommonFunc):
         self.width_frame_ = 60
         self.height_frame_ = 105
         
-        self.imageName = "left_squid"
+        self.imageName = "left_" + str(monster)
+        
+        self.monster = monster
+        self.HP = 0
+        if monster == "squid":
+            self.HP = 5
         
         self.type_move_ = self.type_move["static_threat"]
         self.animation_a_ = 0
@@ -185,7 +190,7 @@ class ThreatsObject(State, CommonFunc):
     def setMapXY(self, x, y):
         self.map_x_[0] = x
         self.map_y_[0] = y
-        
+    
     def impMoveType(self):
         if self.type_move_ == self.type_move["static_threat"]:
             pass

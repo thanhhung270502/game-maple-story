@@ -28,7 +28,11 @@ class Character(State, CommonFunc):
         
         self.imageName = "moveRight"
         
+        self.mesos = 0
+        
         self.bullet_list_: [Bullet] = []
+        
+        self.damage = 2
     
     def setMapXY(self, x, y):
         self.map_x_[0] = x
@@ -101,6 +105,12 @@ class Character(State, CommonFunc):
             bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_)
             bullet.is_move_ = True
             self.bullet_list_.append(bullet)
+            
+        if actions["pickUp"]:
+            self.input_type_.pickUp_ = 1
+        else:
+            self.input_type_.pickUp_ = 0
+            
 
     def handleBullet(self, display):
         length = len(self.bullet_list_)
@@ -125,6 +135,8 @@ class Character(State, CommonFunc):
             self.bullet_list_.pop(index)
             
         return self.bullet_list_
+    
+    # def handlePickUp(self, )
 
     def doPlayer(self, map_data: [Map]):
         self.x_val_= 0

@@ -2,6 +2,9 @@ class Rect:
     def __init__(self, x, y, w, h):
         self.x, self.y = x, y
         self.w, self.h = w, h
+    
+    def getRect(self):
+        return (self.x, self.y, self.w, self.h)
         
     def print_rect(self):
         print("x: ", self.x, "; y: ", self.y)
@@ -36,6 +39,7 @@ class CommonFunc():
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
         self.type_move = {"static_threat": 0, "move_in_space_threat": 1}
+        self.items = {"meso1": (21, 20), "meso2": (21, 20), "meso3": (21, 20), "meso4": (21, 20)}
         
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
@@ -57,10 +61,10 @@ class CommonFunc():
         right_b = object2.x + object2.w
         top_b = object2.y
         bottom_b = object2.y + object2.h
-
+        
         # Case 1: size object 1 < size object 2
         if (left_a > left_b and left_a < right_b):
-            if (top_a > top_b and top_a < bottom_b):
+            if (top_a > top_b and (top_a < bottom_b)):
                 return True
         
             if (bottom_a > top_b and bottom_a < bottom_b):
@@ -104,6 +108,7 @@ class Input:
         self.down_ = 0
         self.jump_ = 0
         self.prevStep_ = 0
+        self.pickUp_ = 0
 
 class Map:
     def __init__(self):

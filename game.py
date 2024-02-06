@@ -24,7 +24,7 @@ class Game(CommonFunc):
         self.running, self.playing = True, True
         self.actions = {"left": False, "right": False, "pause" : False, "start" : False, 
                         "moveLeft": False, "moveRight": False, "moveUp": False, "moveDown": False,
-                        "moveJump": False, "normalAttack": False}
+                        "moveJump": False, "normalAttack": False, "pickUp": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
@@ -64,6 +64,9 @@ class Game(CommonFunc):
                     self.actions['normalAttack'] = True
                 if event.key == pygame.K_SPACE:
                     self.actions['moveJump'] = True
+                if event.key == pygame.K_z:
+                    print("Yes")
+                    self.actions['pickUp'] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -126,6 +129,7 @@ class Game(CommonFunc):
         self.map_dir = os.path.join(self.assets_dir, "map")
         self.char_dir = os.path.join(self.assets_dir, "characters")
         self.monster_dir = os.path.join(self.assets_dir, "monster")
+        self.items_dir = os.path.join(self.assets_dir, "items")
         self.bullet_dir = os.path.join(self.assets_dir, "bullet")
         self.background_dir = os.path.join(self.assets_dir, "background")
         self.sprite_dir = os.path.join(self.assets_dir, "sprites")
