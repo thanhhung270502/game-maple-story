@@ -9,7 +9,8 @@ class Rect:
     def print_rect(self):
         print("x: ", self.x, "; y: ", self.y)
         print("w: ", self.w, "; h: ", self.h)
-
+    def copy(self):
+        return Rect(self.x, self.y, self.w, self.h)
 class CommonFunc():
     def __init__(self):
         self.SCREEN_WIDTH = 1500
@@ -28,13 +29,16 @@ class CommonFunc():
         self.COLOR_KEY_R = 167
         self.COLOR_KEY_G = 175
         self.COLOR_KEY_B = 180
+        
+        self.COLORWHITE = (255, 255, 255)
 
         self.RENDER_DRAW_COLOR = 255
 
-        self.BLANK_TILE = int(0)
+        self.BLANK_TILE = 0
+        self.MAP_TILE = 1000
         self.TILE_SIZE = 60
 
-        self.MAX_MAP_X = 100
+        self.MAX_MAP_X = 25
         self.MAX_MAP_Y = 12
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
@@ -50,6 +54,17 @@ class CommonFunc():
         self.DISTANCE_OF_BULLET = 400
         
         self.FRAME_PER_SECOND = 45      # fps
+        
+        # self.specifications_rect_ = Rect(550, 680, 400, 40)
+        # self.HP_rect_ = Rect(560, 696, 120, 20)
+        # self.MP_rect_ = Rect(690, 696, 120, 20)
+        # self.EXP_rect_ = Rect(820, 696, 120, 20)
+        
+        self.specifications_rect_ = Rect(0, 680, 485, 40)
+        self.HP_rect_ = Rect(95, 696, 120, 20)
+        self.MP_rect_ = Rect(225, 696, 120, 20)
+        self.EXP_rect_ = Rect(355, 696, 120, 20)
+        self.LEVEL_rect_ = Rect(5, 685, 80, 30)
         
     def checkCollision(object1: Rect, object2: Rect):
         left_a = object1.x
@@ -121,3 +136,5 @@ class Map:
         self.tile = []
         self.fileName = ""
         
+        self.max_map_x_ = 0
+        self.max_map_y_ = 0

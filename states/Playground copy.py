@@ -7,7 +7,6 @@ from states.ItemObject import ItemObject
 from states.ImpTimer import ImpTimer
 from states.Geometric import *
 from states.GameMap import *
-from RWFile import HandleFile
 import random
 
 class Playground(State, CommonFunc):
@@ -15,26 +14,28 @@ class Playground(State, CommonFunc):
         State.__init__(self,game)
         CommonFunc.__init__(self)
         
-        self.game.loginBackground_sound.stop()
-        self.game.background_sound.play(loops=-1)
-        
         self.game = game
         
-        self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "huntingArea.png"))
-        
-        self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
-        
+        self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "Henesys.png"))
         self.game_map = GameMap(game)
+        
         self.p_player = Character(game)
         self.fps_timer = ImpTimer()
         
         self.WHITE_COLOR = ColorData(255, 255, 255)
-        self.ORANGE_COLOR = ColorData(222, 138, 66)
         
         self.startTimeToCollision = pygame.time.get_ticks()
         self.indexCollision = -1
         
-        self.dynamic_threats_list: [ThreatsObject] = ThreatsObject.makeThreatsList(self)
+        self.HP = 900
+        self.HP_max_ = 1000
+        self.MP = 400
+        self.MP_max_ = 500
+        
+        self.EXP = 1500
+        self.EXP_max_ = 15000
+        
+        self.dynamic_threats_list: [ThreatsObject] = ThreatsObject.makeThreatsList()
         self.items_list: [ItemObject] = []
         self.mesos = 0
 
@@ -45,11 +46,6 @@ class Playground(State, CommonFunc):
         #     new_state.enter_state()
         self.fps_timer.start()
         self.p_player.handleInputAction(actions)
-        
-        if actions["up"]:
-            self.p_player.input_type_.up_ = 1
-        else:
-            self.p_player.input_type_.up_ = 0
         
         self.game.reset_keys()
 
@@ -82,7 +78,7 @@ class Playground(State, CommonFunc):
             if CommonFunc.checkCollision(object1, object2):
                 currentTime = pygame.time.get_ticks() - self.startTimeToCollision
                 if currentTime >= 2000:
-                    self.stats["HP"] -= 10
+                    self.HP -= 10
                     self.startTimeToCollision = pygame.time.get_ticks()
                     return
 
@@ -107,6 +103,8 @@ class Playground(State, CommonFunc):
                     self.items_list.pop(i)
                     self.p_player.input_type_.pickUp_ = 0
                     return
+
+    
 
     def renderItems(self, display, map_data):
         for item in self.items_list:
@@ -138,24 +136,11 @@ class Playground(State, CommonFunc):
         self.p_player.handleBullet(display)
         
         self.handleCollisionBulletAndMonster()
-        self.handleCollisionCharacterAndMonster()
+        # self.handleCollisionCharacterAndMonster()
         self.handleCollisionPickUp()
         
         Geometric.renderSpecifications(self, display)
         
-        if self.p_player.input_type_.up_ == 1:
-            x1 = int(self.p_player.x_pos_ / self.TILE_SIZE)
-            x2 = int((self.p_player.x_pos_ + self.CHARACTER_WIDTH - 1) / self.TILE_SIZE)
-            
-            y1 = int(self.p_player.y_pos_ / self.TILE_SIZE)
-            y2 = int((self.p_player.y_pos_ + self.CHARACTER_HEIGHT - 1) / self.TILE_SIZE)
-            
-            if  x1 >= 0 and x2 < map_data[0].max_map_x_ and \
-                y1 >= 0 and y2 < map_data[0].max_map_y_:
-                value_1 = map_data[0].tile[y1][x1]
-                if value_1 > self.MAP_TILE:
-                    self.exit_state()
-                    self.p_player.input_type_.up_ = 0
         
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND

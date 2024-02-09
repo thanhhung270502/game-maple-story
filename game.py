@@ -22,9 +22,12 @@ class Game(CommonFunc):
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH,self.SCREEN_HEIGHT))
 
         self.running, self.playing = True, True
-        self.actions = {"left": False, "right": False, "pause" : False, "start" : False, 
+        self.actions = {"left": False, "right": False, "up": False,
+                        "pause" : False, "start" : False, 
                         "moveLeft": False, "moveRight": False, "moveUp": False, "moveDown": False,
-                        "moveJump": False, "normalAttack": False, "pickUp": False}
+                        "moveJump": False, "normalAttack": False, "pickUp": False,
+                        "k_1": False, "k_2": False, "k_3": False, "k_4": False,
+                        "k_c": False, "k_v": False, "k_b": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
@@ -65,8 +68,23 @@ class Game(CommonFunc):
                 if event.key == pygame.K_SPACE:
                     self.actions['moveJump'] = True
                 if event.key == pygame.K_z:
-                    print("Yes")
                     self.actions['pickUp'] = True
+                if event.key == pygame.K_UP:
+                    self.actions["up"] = True
+                if event.key == pygame.K_1:
+                    self.actions["k_1"] = True
+                if event.key == pygame.K_2:
+                    self.actions["k_2"] = True
+                if event.key == pygame.K_3:
+                    self.actions["k_3"] = True
+                if event.key == pygame.K_4:
+                    self.actions["k_4"] = True
+                if event.key == pygame.K_c:
+                    self.actions["k_c"] = True
+                if event.key == pygame.K_v:
+                    self.actions["k_v"] = True
+                if event.key == pygame.K_b:
+                    self.actions["k_b"] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -135,11 +153,14 @@ class Game(CommonFunc):
         self.sprite_dir = os.path.join(self.assets_dir, "sprites")
         self.font_dir = os.path.join(self.assets_dir, "fonts")
         self.sound_dir = os.path.join(self.assets_dir, "sounds")
-        self.huge_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 70)
-        self.large_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 50)
-        self.medium_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 30)
-        self.medium_rare_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 25)
-        self.small_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 15)
+        # self.huge_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 70)
+        # self.large_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 50)
+        # self.medium_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 30)
+        # self.medium_rare_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 25)
+        # self.small_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 15)
+        self.small_font = pygame.font.SysFont("Arial", 10, True)
+        self.medium_font = pygame.font.SysFont("Arial", 15, True)
+        self.large_font = pygame.font.SysFont("Arial", 20, True)
 
     def load_states(self):
         self.title_screen = Title(self)

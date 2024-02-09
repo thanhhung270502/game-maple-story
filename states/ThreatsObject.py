@@ -107,8 +107,8 @@ class ThreatsObject(State, CommonFunc):
                 value_1 = map_data[0].tile[y1][x2]
                 value_2 = map_data[0].tile[y2][x2]
                 # print("value_1: ", value_1, "; value_2: ", value_2)
-                if value_1 > self.BLANK_TILE or \
-                    value_2 > self.BLANK_TILE:
+                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
                     self.x_pos_ = x2 * self.TILE_SIZE
                     self.x_pos_ -= self.MONSTER_WIDTH + 1
                     self.x_val_ = 0
@@ -120,17 +120,17 @@ class ThreatsObject(State, CommonFunc):
                         if self.input_type_.left_ == 1:
                             self.input_type_.right_ = 1
                             self.input_type_.left_ = 0
-                            self.imageName = "right_squid"
+                            self.imageName = "right_" + str(self.monster)
                         elif self.input_type_.right_ == 1:
                             self.input_type_.left_ = 1
                             self.input_type_.right_ = 0
-                            self.imageName = "left_squid"
+                            self.imageName = "left_" + str(self.monster)
                         self.startTimeToStuck = -1
             elif self.x_val_ < 0:
                 value_1 = map_data[0].tile[y1][x1]
                 value_2 = map_data[0].tile[y2][x1]
-                if value_1 > self.BLANK_TILE or \
-                    value_2 > self.BLANK_TILE:
+                if (value_1 > self.BLANK_TILE and value_2 < self.MAP_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.x_val_ = 0
                 if self.startTimeToStuck == -1:
@@ -140,11 +140,11 @@ class ThreatsObject(State, CommonFunc):
                     if self.input_type_.left_ == 1:
                         self.input_type_.right_ = 1
                         self.input_type_.left_ = 0
-                        self.imageName = "right_squid"
+                        self.imageName = "right_" + str(self.monster)
                     elif self.input_type_.right_ == 1:
                         self.input_type_.left_ = 1
                         self.input_type_.right_ = 0
-                        self.imageName = "left_squid"
+                        self.imageName = "left_" + str(self.monster)
                     self.startTimeToStuck = -1
         
         # Check vertical position
@@ -162,7 +162,8 @@ class ThreatsObject(State, CommonFunc):
             if self.y_val_ > 0:
                 value_1 = map_data[0].tile[y2][x1]
                 value_2 = map_data[0].tile[y2][x2]
-                if value_1 > self.BLANK_TILE or value_2 > self.BLANK_TILE:
+                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
                     self.y_pos_ = y2 * self.TILE_SIZE
                     self.y_pos_ -= self.MONSTER_HEIGHT + 1
                     self.y_val_ = 0
@@ -170,11 +171,11 @@ class ThreatsObject(State, CommonFunc):
             elif self.y_val_ < 0:
                 value_1 = map_data[0].tile[y1][x1]
                 value_2 = map_data[0].tile[y1][x2]
-                if value_1 > self.BLANK_TILE or value_2 > self.BLANK_TILE:
+                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.y_val_ = 0
                     self.on_ground_ = False
-        
         
         self.x_pos_ += self.x_val_
         self.y_pos_ += self.y_val_
@@ -208,3 +209,27 @@ class ThreatsObject(State, CommonFunc):
                 if self.input_type_.left_ == 1:
                     self.imageName = "left_squid"
     
+    def makeThreatsList(self):
+        dynamic_threats_list: [ThreatsObject] = []
+        
+        for i in range(10):
+            p_threat = ThreatsObject(self.game, 500 + i * 300, 200, "squid") 
+            p_threat.animation_a_ = p_threat.x_pos_ - 200
+            p_threat.animation_b_ = p_threat.x_pos_ + 200
+            p_threat.type_move_ = self.type_move["move_in_space_threat"]
+            p_threat.input_type_.left_ = 1
+            dynamic_threats_list.append(p_threat)
+        
+        # for i in range(10):
+        #     p_threat = ThreatsObject(self.game, 700 + i * 1200, 200)
+        #     p_threat.type_move_ = self.type_move["static_threat"]
+        #     p_threat.input_type_.left_ = 0
+        #     dynamic_threats_list.append(p_threat)
+
+        return dynamic_threats_list
+    
+    def removeMonster(index, dynamic_threats_list):
+        size = len(dynamic_threats_list)
+        if size > 0 and index < size:
+            dynamic_threats_list.pop(index)
+        return dynamic_threats_list
