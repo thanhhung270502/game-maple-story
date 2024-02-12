@@ -16,6 +16,7 @@ class Playground(State, CommonFunc):
         CommonFunc.__init__(self)
         
         self.game.loginBackground_sound.stop()
+        self.game.background_sound.stop()
         self.game.background_sound.play(loops=-1)
         
         self.game = game
@@ -34,8 +35,8 @@ class Playground(State, CommonFunc):
         self.startTimeToCollision = pygame.time.get_ticks()
         self.indexCollision = -1
         
-        self.dynamic_threats_list: [ThreatsObject] = ThreatsObject.makeThreatsList(self)
-        self.items_list: [ItemObject] = []
+        self.dynamic_threats_list: list[ThreatsObject] = ThreatsObject.makeThreatsList(self)
+        self.items_list: list[ItemObject] = []
         self.mesos = 0
 
     def update(self, actions, mouse_pos):
@@ -53,16 +54,30 @@ class Playground(State, CommonFunc):
         
         self.game.reset_keys()
 
-    def handleCollisionBulletAndMonster(self):
+    def handleCollisionBulletAndMonster(self, display):
         for i in range(len(self.p_player.bullet_list_)):
             for j in range(len(self.dynamic_threats_list)):
                 object1 = Rect(self.p_player.bullet_list_[i].x_pos_, self.p_player.bullet_list_[i].y_pos_, self.p_player.bullet_list_[i].width_frame_, self.p_player.bullet_list_[i].height_frame_)
                 object2 = Rect(self.dynamic_threats_list[j].x_pos_, self.dynamic_threats_list[j].y_pos_, self.dynamic_threats_list[j].width_frame_, self.dynamic_threats_list[j].height_frame_)
 
                 if CommonFunc.checkCollision(object1, object2):
-                    self.p_player.bullet_list_ = self.p_player.removeBullet(i)
+                    damage = 0
                     
-                    if self.dynamic_threats_list[j].HP < self.p_player.damage:
+                    if self.p_player.bullet_list_[i].name == "star_special":
+                        if self.p_player.bullet_list_[i].skill == "ctrl":
+                            damage = self.stats["attack"] + 15
+                            print(damage)
+                        elif self.p_player.bullet_list_[i].skill == "v":
+                            damage = self.stats["skill_2"]["damage"] + 15
+
+                    elif self.p_player.bullet_list_[i].name == "star_normal":
+                        if self.p_player.bullet_list_[i].skill == "ctrl":
+                            damage = self.stats["attack"]
+                            print(damage)
+                        elif self.p_player.bullet_list_[i].skill == "v":
+                            damage = self.stats["skill_2"]["damage"]
+                    
+                    if self.dynamic_threats_list[j].HP < damage:
                         self.dynamic_threats_list = ThreatsObject.removeMonster(j, self.dynamic_threats_list)
                         meso = "meso1"
                         if self.dynamic_threats_list[j].monster == "squid":
@@ -70,8 +85,18 @@ class Playground(State, CommonFunc):
                         item = ItemObject(self.game, object2.x, object2.y, meso)
                         self.items_list.append(item)
                     else:
-                        self.dynamic_threats_list[j].HP -= self.p_player.damage
+                        self.dynamic_threats_list[j].HP -= damage
                     
+                    damage_string = str(damage)
+                    damage_text = self.game.huge_font.render(damage_string, True, self.WHITE_COLOR.getColor(), self.ORANGE_COLOR.getColor())
+                    damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2, self.dynamic_threats_list[j].y_pos_ - 20)
+                    display.blit(damage_text, damage_pos)
+                    
+                    if self.p_player.bullet_list_[i].numOfMonster == 1 and self.dynamic_threats_list[j].id not in self.p_player.bullet_list_[i].numOfHitMonster:
+                        self.p_player.bullet_list_ = self.p_player.removeBullet(i)
+                    else:
+                        self.p_player.bullet_list_[i].numOfHitMonster.append(self.dynamic_threats_list[j].id)
+                        self.p_player.bullet_list_[i].numOfMonster -= 1
                     return
 
     def handleCollisionCharacterAndMonster(self):
@@ -137,7 +162,7 @@ class Playground(State, CommonFunc):
         
         self.p_player.handleBullet(display)
         
-        self.handleCollisionBulletAndMonster()
+        self.handleCollisionBulletAndMonster(display)
         self.handleCollisionCharacterAndMonster()
         self.handleCollisionPickUp()
         

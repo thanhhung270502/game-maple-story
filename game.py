@@ -161,6 +161,7 @@ class Game(CommonFunc):
         self.small_font = pygame.font.SysFont("Arial", 10, True)
         self.medium_font = pygame.font.SysFont("Arial", 15, True)
         self.large_font = pygame.font.SysFont("Arial", 20, True)
+        self.huge_font = pygame.font.SysFont("Arial", 30, True)
 
     def load_states(self):
         self.title_screen = Title(self)

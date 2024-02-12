@@ -3,7 +3,7 @@ from states.CommonFunc import *
 from states.State import State
 
 class ThreatsObject(State, CommonFunc):
-    def __init__(self, game, x_pos, y_pos, monster):
+    def __init__(self, game, x_pos, y_pos, monster, id):
         State.__init__(self, game)
         CommonFunc.__init__(self)
         
@@ -11,6 +11,7 @@ class ThreatsObject(State, CommonFunc):
         self.y_val_ = 0
         self.x_pos_ = x_pos
         self.y_pos_ = y_pos
+        self.id = id
         
         self.map_x_ = [0]
         self.map_y_ = [0]
@@ -67,7 +68,7 @@ class ThreatsObject(State, CommonFunc):
             image = pygame.image.load(os.path.join(self.game.monster_dir, imageName))
             display.blit(image, (rect_x, rect_y))
             
-    def doPlayer(self, map_data: [Map]):
+    def doPlayer(self, map_data: list[Map]):
         if self.come_back_time_ == 0:
             self.x_val_= 0
             self.y_val_ += self.GRAVITY_SPEED
@@ -89,7 +90,7 @@ class ThreatsObject(State, CommonFunc):
             if self.come_back_time_ == 0:
                 self.initial()
     
-    def checkToMap(self, map_data: [Map]): 
+    def checkToMap(self, map_data: list[Map]): 
         x1, x2, y1, y2 = 0, 0, 0, 0
         
         # Check horizontal position
@@ -210,10 +211,11 @@ class ThreatsObject(State, CommonFunc):
                     self.imageName = "left_squid"
     
     def makeThreatsList(self):
-        dynamic_threats_list: [ThreatsObject] = []
+        dynamic_threats_list: list[ThreatsObject] = []
         
         for i in range(10):
-            p_threat = ThreatsObject(self.game, 500 + i * 300, 200, "squid") 
+            p_threat = ThreatsObject(self.game, 500 + i * 100, 200, "squid", self.id_monsters) 
+            self.id_monsters += 1
             p_threat.animation_a_ = p_threat.x_pos_ - 200
             p_threat.animation_b_ = p_threat.x_pos_ + 200
             p_threat.type_move_ = self.type_move["move_in_space_threat"]

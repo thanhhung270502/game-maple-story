@@ -35,7 +35,7 @@ class Character(State, CommonFunc):
         
         self.mesos = 0
         
-        self.bullet_list_: [Bullet] = []
+        self.bullet_list_: list[Bullet] = []
         
         self.damage = 2
     
@@ -93,11 +93,11 @@ class Character(State, CommonFunc):
             self.input_type_.jump_ = 0
 
         if actions["normalAttack"]:
-            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_, self.stats["bullet"], "ctrl")
+            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_, self.stats["bullet"], "ctrl", 1)
             bullet.is_move_ = True
             self.bullet_list_.append(bullet)
         elif actions["k_v"]:
-            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 3), self.status_, self.stats["bullet"], "v")
+            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 3), self.status_, self.stats["bullet"], "v", self.stats["skill_2"]["numOfMonsters"])
             bullet.is_move_ = True
             self.bullet_list_.append(bullet)
         
@@ -150,7 +150,7 @@ class Character(State, CommonFunc):
             
         return self.bullet_list_
 
-    def doPlayer(self, map_data: [Map]):
+    def doPlayer(self, map_data: list[Map]):
         self.x_val_= 0
         self.y_val_ += self.GRAVITY_SPEED
         
@@ -171,7 +171,7 @@ class Character(State, CommonFunc):
         self.checkToMap(map_data)
         self.centerCharacterOnMap(map_data)
 
-    def centerCharacterOnMap(self, map_data: [Map]):
+    def centerCharacterOnMap(self, map_data: list[Map]):
         if self.x_pos_ + (self.SCREEN_WIDTH / 2) < (map_data[0].max_map_x_ * self.TILE_SIZE):
             map_data[0].start_x_[0] = self.x_pos_ - (self.SCREEN_WIDTH / 2)
             if map_data[0].start_x_[0] < 0:
@@ -186,7 +186,7 @@ class Character(State, CommonFunc):
         # elif (map_data[0].start_y_[0] + self.SCREEN_HEIGHT >= map_data[0].max_y_ * 2):
         #     map_data[0].start_y_[0] = map_data[0].max_y_ - self.SCREEN_HEIGHT
 
-    def checkToMap(self, map_data: [Map]):
+    def checkToMap(self, map_data: list[Map]):
         x1, x2, y1, y2 = 0, 0, 0, 0
         
         # Check horizontal position

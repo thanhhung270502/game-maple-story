@@ -55,6 +55,8 @@ class CommonFunc():
         
         self.FRAME_PER_SECOND = 45      # fps
         
+        self.id_monsters = 0
+        
         # self.specifications_rect_ = Rect(550, 680, 400, 40)
         # self.HP_rect_ = Rect(560, 696, 120, 20)
         # self.MP_rect_ = Rect(690, 696, 120, 20)

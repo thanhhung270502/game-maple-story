@@ -3,7 +3,7 @@ from states.CommonFunc import *
 from states.State import State
 
 class Bullet(CommonFunc, State):
-    def __init__(self, game, x_pos, y_pos, bullet_dir, name, skill):
+    def __init__(self, game, x_pos, y_pos, bullet_dir, name, skill, numOfMonster):
         CommonFunc.__init__(self)
         State.__init__(self, game)
         
@@ -22,6 +22,8 @@ class Bullet(CommonFunc, State):
         self.bullet_dir_ = bullet_dir
         self.name = name
         self.skill = skill
+        self.numOfMonster = numOfMonster
+        self.numOfHitMonster = []
         
     def handleMove(self, x_border, xNeg_border):
         if self.bullet_dir_ == self.move["right"]:
