@@ -25,7 +25,7 @@ class Result(State):
         self.backToHome_hover = False
         self.tryAgain_hover = False
         
-        self.weapons = HandleFile.loadScore(self.game.assets_dir, "weapon.json")
+        self.weapons = HandleFile.loadFile(self.game.assets_dir, "weapon.json")
         self.weapon = 1
         self.backConfirm_bg = False
         
@@ -33,7 +33,7 @@ class Result(State):
         self.miss = miss
         self.level = level
         
-        self.scores = HandleFile.loadScore(self.game.assets_dir, "score.json")
+        self.scores = HandleFile.loadFile(self.game.assets_dir, "score.json")
         
         self.scores["totalScore"] += score
         

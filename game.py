@@ -22,12 +22,17 @@ class Game(CommonFunc):
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH,self.SCREEN_HEIGHT))
 
         self.running, self.playing = True, True
-        self.actions = {"left": False, "right": False, "pause" : False, "start" : False, 
+        self.actions = {"left": False, "right": False, "up": False,
+                        "pause" : False, "start" : False, 
                         "moveLeft": False, "moveRight": False, "moveUp": False, "moveDown": False,
-                        "moveJump": False}
+                        "moveJump": False, "normalAttack": False, "pickUp": False,
+                        "k_1": False, "k_2": False, "k_3": False, "k_4": False,
+                        "k_c": False, "k_v": False, "k_b": False,
+                        "k_i": False, "dragging": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
+        self.dragging = False
         self.load_assets()
         self.load_states()
 
@@ -55,21 +60,38 @@ class Game(CommonFunc):
                     if self.play_pickup_sound:
                         self.pickup_sound.play()  # Play click sound
                 self.mouse_pos = pygame.mouse.get_pos()
+                
+                self.dragging = not self.dragging
+            self.actions["dragging"] = self.dragging
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.actions['pause'] = True
                 if event.key == pygame.K_RETURN:
                     self.actions['start'] = True
-                if event.key == pygame.K_LEFT:
-                    self.actions['moveLeft'] = True
-                if event.key == pygame.K_RIGHT:
-                    self.actions['moveRight'] = True
-                if event.key == pygame.K_UP:
-                    self.actions['moveUp'] = True
-                if event.key == pygame.K_DOWN:
-                    self.actions['moveDown'] = True
-                if event.key == pygame.K_BACKSPACE:
+                if event.key == pygame.K_LCTRL:
+                    self.actions['normalAttack'] = True
+                if event.key == pygame.K_SPACE:
                     self.actions['moveJump'] = True
+                if event.key == pygame.K_z:
+                    self.actions['pickUp'] = True
+                if event.key == pygame.K_UP:
+                    self.actions["up"] = True
+                if event.key == pygame.K_1:
+                    self.actions["k_1"] = True
+                if event.key == pygame.K_2:
+                    self.actions["k_2"] = True
+                if event.key == pygame.K_3:
+                    self.actions["k_3"] = True
+                if event.key == pygame.K_4:
+                    self.actions["k_4"] = True
+                if event.key == pygame.K_c:
+                    self.actions["k_c"] = True
+                if event.key == pygame.K_v:
+                    self.actions["k_v"] = True
+                if event.key == pygame.K_b:
+                    self.actions["k_b"] = True
+                if event.key == pygame.K_i:
+                    self.actions["k_i"] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -78,23 +100,34 @@ class Game(CommonFunc):
                     self.actions['left'] = False
                 if mouse_click[2]:
                     self.actions['right'] = False
+                    
+                # self.actions["dragging"] = False
                 self.mouse_pos = pygame.mouse.get_pos()
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_ESCAPE:
-                    self.actions['pause'] = False   
-                if event.key == pygame.K_RETURN:
-                    self.actions['start'] = False
-                if event.key == pygame.K_LEFT:
-                    self.actions['moveLeft'] = False
-                if event.key == pygame.K_RIGHT:
-                    self.actions['moveRight'] = False
-                if event.key == pygame.K_UP:
-                    self.actions['moveUp'] = False
-                if event.key == pygame.K_DOWN:
-                    self.actions['moveDown'] = False
-                if event.key == pygame.K_BACKSPACE:
-                    self.actions['moveJump'] = False
-                self.mouse_pos = (0,0)
+            # if event.type == pygame.KEYUP:
+            #     if event.key == pygame.K_ESCAPE:
+            #         self.actions['pause'] = False   
+            #     if event.key == pygame.K_RETURN:
+            #         self.actions['start'] = False
+            #     if event.key == pygame.K_LEFT:
+            #         self.actions['moveLeft'] = False
+            #     if event.key == pygame.K_RIGHT:
+            #         self.actions['moveRight'] = False
+            #     if event.key == pygame.K_UP:
+            #         self.actions['moveUp'] = False
+            #     if event.key == pygame.K_DOWN:
+            #         self.actions['moveDown'] = False
+            #     if event.key == pygame.K_BACKSPACE:
+            #         self.actions['moveJump'] = False
+            #     self.mouse_pos = (0,0)
+
+        userInput = pygame.key.get_pressed()
+        if userInput[pygame.K_LEFT]:
+            self.actions["moveLeft"] = True
+        if userInput[pygame.K_RIGHT]:
+            self.actions["moveRight"] = True
+        # if userInput[pygame.K_SPACE]:
+        #     print("backspace")
+        #     self.actions['moveJump'] = True
 
     def update(self):
         self.state_stack[-1].update(self.actions, self.screen)
@@ -122,15 +155,23 @@ class Game(CommonFunc):
         self.assets_dir = os.path.join("./assets")
         self.map_dir = os.path.join(self.assets_dir, "map")
         self.char_dir = os.path.join(self.assets_dir, "characters")
+        self.monster_dir = os.path.join(self.assets_dir, "monster")
+        self.items_dir = os.path.join(self.assets_dir, "items")
+        self.bullet_dir = os.path.join(self.assets_dir, "bullet")
         self.background_dir = os.path.join(self.assets_dir, "background")
         self.sprite_dir = os.path.join(self.assets_dir, "sprites")
         self.font_dir = os.path.join(self.assets_dir, "fonts")
         self.sound_dir = os.path.join(self.assets_dir, "sounds")
-        self.huge_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 70)
-        self.large_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 50)
-        self.medium_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 30)
-        self.medium_rare_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 25)
-        self.small_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 15)
+        # self.huge_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 70)
+        # self.large_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 50)
+        # self.medium_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 30)
+        # self.medium_rare_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 25)
+        # self.small_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 15)
+        self.small_font = pygame.font.SysFont("Arial", 10, True)
+        self.small_med_font = pygame.font.SysFont("Arial", 12, True)
+        self.medium_font = pygame.font.SysFont("Arial", 15, True)
+        self.large_font = pygame.font.SysFont("Arial", 20, True)
+        self.huge_font = pygame.font.SysFont("Arial", 30, True)
 
     def load_states(self):
         self.title_screen = Title(self)
@@ -142,6 +183,7 @@ class Game(CommonFunc):
 
     def load_sounds(self):
         self.background_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "henesys.mp3"))
+        self.loginBackground_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "login.mp3"))
 
         self.play_pickup_sound = True
         self.pickup_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "pickup.wav"))
@@ -150,7 +192,7 @@ class Game(CommonFunc):
         self.explosion_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "explosion.wav"))
         self.wrong_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "wrong.mp3"))
 
-        self.background_sound.play(loops=-1)
+        self.loginBackground_sound.play(loops=-1)
 
 
 if __name__ == "__main__":
