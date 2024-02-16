@@ -43,7 +43,8 @@ class CommonFunc():
         self.move = {"right": 0, "left": 1, "up": 2, "down": 3}
         
         self.type_move = {"static_threat": 0, "move_in_space_threat": 1}
-        self.items = {"meso1": (21, 20), "meso2": (21, 20), "meso3": (21, 20), "meso4": (21, 20)}
+        self.items = {"meso1": (21, 20), "meso2": (21, 20), "meso3": (21, 20), "meso4": (21, 20), 
+                      "HP_drop": (25, 25), "MP_drop": (25, 25), "star_normal_drop": (25, 25), "star_special_drop": (25, 25)}
         
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
@@ -116,6 +117,16 @@ class CommonFunc():
             return True
         
         return False
+
+    def chuyen_chuoi_thanh_chuoi_dinh_dang_so(chuoi):
+        # Chuyển chuỗi thành số nguyên
+        so_nguyen = int(chuoi)
+        
+        # Sử dụng định dạng f-string để thêm dấu phẩy vào giữa các chữ số
+        chuoi_ket_qua = f"{so_nguyen:,}"
+        
+        return str(chuoi_ket_qua)
+
 
 class Input:
     def __init__(self) -> None:

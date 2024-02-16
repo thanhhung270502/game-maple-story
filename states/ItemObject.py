@@ -3,7 +3,7 @@ from states.CommonFunc import *
 from states.State import State
 
 class ItemObject(State, CommonFunc):
-    def __init__(self, game, x_pos, y_pos, item):
+    def __init__(self, game, x_pos, y_pos, item, num):
         State.__init__(self, game)
         CommonFunc.__init__(self)
         
@@ -16,13 +16,15 @@ class ItemObject(State, CommonFunc):
         self.width_frame_ = self.items[item][0]
         self.height_frame_ = self.items[item][1]
         
-        self.item = item
+        self.num = num
+        
+        self.item_type = item
         
     def show(self, display):
         rect_x = self.x_pos_ - self.map_x_[0]
         rect_y = self.y_pos_ - self.map_y_[0]
         
-        imageName = self.item + ".png"
+        imageName = self.item_type + ".png"
         image = pygame.image.load(os.path.join(self.game.items_dir, imageName))
         display.blit(image, (rect_x, rect_y))
     

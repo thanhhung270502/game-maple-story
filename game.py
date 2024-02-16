@@ -27,10 +27,12 @@ class Game(CommonFunc):
                         "moveLeft": False, "moveRight": False, "moveUp": False, "moveDown": False,
                         "moveJump": False, "normalAttack": False, "pickUp": False,
                         "k_1": False, "k_2": False, "k_3": False, "k_4": False,
-                        "k_c": False, "k_v": False, "k_b": False}
+                        "k_c": False, "k_v": False, "k_b": False,
+                        "k_i": False, "dragging": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
+        self.dragging = False
         self.load_assets()
         self.load_states()
 
@@ -58,6 +60,9 @@ class Game(CommonFunc):
                     if self.play_pickup_sound:
                         self.pickup_sound.play()  # Play click sound
                 self.mouse_pos = pygame.mouse.get_pos()
+                
+                self.dragging = not self.dragging
+            self.actions["dragging"] = self.dragging
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.actions['pause'] = True
@@ -85,6 +90,8 @@ class Game(CommonFunc):
                     self.actions["k_v"] = True
                 if event.key == pygame.K_b:
                     self.actions["k_b"] = True
+                if event.key == pygame.K_i:
+                    self.actions["k_i"] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -93,6 +100,8 @@ class Game(CommonFunc):
                     self.actions['left'] = False
                 if mouse_click[2]:
                     self.actions['right'] = False
+                    
+                # self.actions["dragging"] = False
                 self.mouse_pos = pygame.mouse.get_pos()
             # if event.type == pygame.KEYUP:
             #     if event.key == pygame.K_ESCAPE:
@@ -159,6 +168,7 @@ class Game(CommonFunc):
         # self.medium_rare_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 25)
         # self.small_font = pygame.font.Font(os.path.join(self.font_dir, "font.ttf"), 15)
         self.small_font = pygame.font.SysFont("Arial", 10, True)
+        self.small_med_font = pygame.font.SysFont("Arial", 12, True)
         self.medium_font = pygame.font.SysFont("Arial", 15, True)
         self.large_font = pygame.font.SysFont("Arial", 20, True)
         self.huge_font = pygame.font.SysFont("Arial", 30, True)

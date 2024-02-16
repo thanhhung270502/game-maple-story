@@ -1,6 +1,1 @@
-{
-    "HP": 35,
-    "MP": 35,
-    "star_normal": 500,
-    "star_special": 1000
-}
+{"HP": 35, "MP": 50, "star_normal": 500, "star_special": 500}

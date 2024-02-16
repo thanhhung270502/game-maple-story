@@ -25,7 +25,9 @@ class Geometric:
     def renderRectangle2(geo_size: Rect, color_data: ColorData, display, border_size):
         pygame.draw.rect(display, color_data.getColor(), geo_size.getRect(), 0, -1, border_size, -1, border_size, -1)
     
-    def renderOutline(self, geo_size: GeometricFormat, color_data: ColorData, display): pass
+    def renderOutline(geo_size: Rect, color_data: ColorData, display, border_size, border_width): 
+        pygame.draw.rect(display, color_data.getColor(), geo_size.getRect(), border_width, -1, border_size, -1, border_size, -1)
+    
     
     def renderSpecifications(self, display):
         self.small_font = pygame.font.SysFont("Arial", 10, True)

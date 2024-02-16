@@ -30,7 +30,7 @@ class ThreatsObject(State, CommonFunc):
         self.monster = monster
         self.HP = 0
         if monster == "squid":
-            self.HP = 5
+            self.HP = 50
         
         self.type_move_ = self.type_move["static_threat"]
         self.animation_a_ = 0
@@ -214,7 +214,7 @@ class ThreatsObject(State, CommonFunc):
         dynamic_threats_list: list[ThreatsObject] = []
         
         for i in range(10):
-            p_threat = ThreatsObject(self.game, 500 + i * 100, 200, "squid", self.id_monsters) 
+            p_threat = ThreatsObject(self.game, 500 + i * 300, 200, "squid", self.id_monsters) 
             self.id_monsters += 1
             p_threat.animation_a_ = p_threat.x_pos_ - 200
             p_threat.animation_b_ = p_threat.x_pos_ + 200

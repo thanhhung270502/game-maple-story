@@ -24,6 +24,7 @@ class Playground(State, CommonFunc):
         self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "huntingArea.png"))
         
         self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
         
         self.game_map = GameMap(game)
         self.p_player = Character(game)
@@ -38,6 +39,20 @@ class Playground(State, CommonFunc):
         self.dynamic_threats_list: list[ThreatsObject] = ThreatsObject.makeThreatsList(self)
         self.items_list: list[ItemObject] = []
         self.mesos = 0
+        
+        self.WHITE_COLOR = ColorData(255, 255, 255)
+        self.BLACK_COLOR = ColorData(0, 0, 0)
+        self.ORANGE_COLOR = ColorData(222, 138, 66)
+        
+        # self.bag_bg = pygame.image.load(os.path.join(self.game.items_dir, "bag.png"))
+        self.bag_bg = None
+        self.items_bag_rect = []
+        self.items_rect = []
+        self.item_selected = -1
+        self.dragging = False
+        self.drop = False
+        
+        self.close_bag_box = pygame.Rect(1268, 117, 19, 19)
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
@@ -51,6 +66,50 @@ class Playground(State, CommonFunc):
             self.p_player.input_type_.up_ = 1
         else:
             self.p_player.input_type_.up_ = 0
+        
+        if actions["k_i"]:
+            if self.bag_bg:
+                self.bag_bg = None
+                self.item_selected = -1
+                self.dragging = False
+            else:
+                self.bag_bg = pygame.image.load(os.path.join(self.game.items_dir, "bag.png"))
+                self.item_selected = -1
+                self.dragging = False
+        
+        if actions["left"] and self.close_bag_box.collidepoint(pygame.mouse.get_pos()):
+            self.bag_bg = None
+            self.item_selected = -1
+            self.dragging = False
+        
+        if actions["left"] and self.dragging:
+            self.drop = True
+        
+        for i in range(len(self.items_rect)):
+            if actions["left"] and self.items_rect[i].collidepoint(pygame.mouse.get_pos()):
+                if not self.dragging:
+                    self.item_selected = i
+                    self.dragging = True
+                
+                # print(i)
+        # if actions["left"]:
+            
+        
+        # if actions["dragging"]:
+        #     print("yes")
+        #     for i in range(len(self.items_rect)):
+        #         if self.items_rect[i].collidepoint(pygame.mouse.get_pos()) and not self.dragging:
+        #             self.item_selected = i
+        #             self.dragging = actions["dragging"]
+        # else:
+        #     self.item_selected = -1
+        
+        # if event.type == pygame.MOUSEBUTTONDOWN:
+        #             self.dragging = True
+        #     print(2)
+        # elif event.type == pygame.MOUSEBUTTONUP:
+        #     self.dragging = False
+        #     self.item_selected = -1
         
         self.game.reset_keys()
 
@@ -79,10 +138,22 @@ class Playground(State, CommonFunc):
                     
                     if self.dynamic_threats_list[j].HP < damage:
                         self.dynamic_threats_list = ThreatsObject.removeMonster(j, self.dynamic_threats_list)
-                        meso = "meso1"
+                        # drop meso
+                        mesoName = "meso1"
                         if self.dynamic_threats_list[j].monster == "squid":
-                            meso = "meso3"
-                        item = ItemObject(self.game, object2.x, object2.y, meso)
+                            mesoName = "meso3"
+                        
+                        meso = 0
+                        if mesoName == "meso1":
+                            meso = random.randint(50, 200)
+                        elif mesoName == "meso2":
+                            meso = random.randint(200, 500)
+                        elif mesoName == "meso3":
+                            meso = random.randint(500, 1000)
+                        elif mesoName == "meso4":
+                            meso = random.randint(1000, 5000)
+                            
+                        item = ItemObject(self.game, object2.x, object2.y, mesoName, meso)
                         self.items_list.append(item)
                     else:
                         self.dynamic_threats_list[j].HP -= damage
@@ -117,18 +188,16 @@ class Playground(State, CommonFunc):
             for i in range(len(self.items_list)):
                 object2 = Rect(self.items_list[i].x_pos_, self.items_list[i].y_pos_, self.items_list[i].width_frame_, self.items_list[i].height_frame_)
                 if CommonFunc.checkCollision(object1, object2):
-                    print("here")
-                    meso = 0
-                    if self.items_list[i].item == "meso1":
-                        meso = random.randint(50, 200)
-                    elif self.items_list[i].item == "meso2":
-                        meso = random.randint(200, 500)
-                    elif self.items_list[i].item == "meso3":
-                        meso = random.randint(500, 1000)
-                    elif self.items_list[i].item == "meso4":
-                        meso = random.randint(1000, 5000)
-                    
-                    self.mesos += meso
+                    if "meso" in self.items_list[i].item_type:
+                        self.stats["meso"] += self.items_list[i].num
+                        
+                    # else:
+                    elif "HP" in self.items_list[i].item_type:
+                        self.items["HP"] += self.items_list[i].num
+                        
+                        
+                        
+                        
                     self.items_list.pop(i)
                     self.p_player.input_type_.pickUp_ = 0
                     return
@@ -137,6 +206,59 @@ class Playground(State, CommonFunc):
         for item in self.items_list:
             item.setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
             item.show(display)
+            
+    def renderBag(self, display):
+        if self.bag_bg:
+            display.blit(self.bag_bg, (1100, 110))
+            
+            meso_string = CommonFunc.chuyen_chuoi_thanh_chuoi_dinh_dang_so(str(self.stats["meso"]))
+            meso_text = self.game.medium_font.render(meso_string, True, self.BLACK_COLOR.getColor())
+            meso_pos = (1152, 414)
+            display.blit(meso_text, meso_pos)            
+
+            O_x = 1106
+            O_y = 205
+            index = 0
+            self.items_bag_rect = []
+            self.items_rect = []
+            for key in self.items:
+                if self.items[key] != 0:
+                    
+                    item_rect = Rect(O_x, O_y - 33, 45, 45)
+                    self.items_bag_rect.append(item_rect)
+                    
+                    item_rect = pygame.Rect(O_x, O_y - 33, 45, 45)
+                    self.items_rect.append(item_rect)
+                    
+                    if self.item_selected == index and self.dragging:
+                        # Geometric.renderOutline(item_rect, ColorData(105, 147, 255), display, 3, 2)
+                        if self.drop:
+                            item_rect.x, item_rect.y = self.p_player.x_pos_, self.p_player.y_pos_ - 30
+                            self.dragging = False
+                            self.item_selected = -1
+                            self.drop = False
+                            item_drop = ItemObject(self.game, self.p_player.x_pos_, self.p_player.y_pos_ - 35, key + "_drop", self.items[key])
+                            self.items[key] = 0
+                            self.items_list.append(item_drop)
+                            continue
+                        else:
+                            item_rect.x, item_rect.y = pygame.mouse.get_pos()
+                    
+                    imageName = str(key) + ".png"
+                    image = pygame.image.load(os.path.join(self.game.items_dir, imageName))
+                    pos = (item_rect.x, item_rect.y)
+                    display.blit(image, pos)
+                    
+                    string = str(self.items[key])
+                    text = self.game.small_med_font.render(string, True, self.BLACK_COLOR.getColor())
+                    pos = (O_x, O_y)
+                    O_x += 47
+                    display.blit(text, pos)
+                    index += 1
+                
+                    if index % 4 == 0:
+                        O_x = 1106
+                        O_y += 47
 
     def render(self, display):
         display.blit(self.img_background, (0,0))
@@ -166,6 +288,11 @@ class Playground(State, CommonFunc):
         self.handleCollisionCharacterAndMonster()
         self.handleCollisionPickUp()
         
+        self.renderBag(display)
+        
+        HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
+        HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
+        
         Geometric.renderSpecifications(self, display)
         
         if self.p_player.input_type_.up_ == 1:
@@ -188,4 +315,4 @@ class Playground(State, CommonFunc):
         if (real_imp_time < time_one_frame):
             delay_time = time_one_frame - real_imp_time
             if delay_time > 0:
-                pygame.time.delay(int(delay_time + 50))
+                pygame.time.delay(int(delay_time + 0))
