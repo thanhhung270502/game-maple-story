@@ -1,0 +1,12 @@
+{
+    "squid": {
+        "width": 60,
+        "height": 105,
+        "HP": 5000
+    },
+    "boss": {
+        "width": 150,
+        "height": 240,
+        "HP": 50000
+    }
+}

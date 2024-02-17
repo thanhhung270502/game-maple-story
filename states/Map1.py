@@ -4,13 +4,14 @@ from states.CommonFunc import *
 from states.Character import Character
 from states.ThreatsObject import ThreatsObject
 from states.ItemObject import ItemObject
+from states.Map2 import Map2
 from states.ImpTimer import ImpTimer
 from states.Geometric import *
 from states.GameMap import *
 from RWFile import HandleFile
 import random
 
-class Playground(State, CommonFunc):
+class Map1(State, CommonFunc):
     def __init__(self, game):
         State.__init__(self,game)
         CommonFunc.__init__(self)
@@ -21,7 +22,9 @@ class Playground(State, CommonFunc):
         
         self.game = game
         
-        self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "huntingArea.png"))
+        self.setMap = False
+        
+        self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "map1.png"))
         
         self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
         self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
@@ -53,6 +56,10 @@ class Playground(State, CommonFunc):
         self.drop = False
         
         self.close_bag_box = pygame.Rect(1268, 117, 19, 19)
+        
+        # Handle open new map
+        self.open_map = False
+        self.timeToOpenMap = 0
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
@@ -90,27 +97,7 @@ class Playground(State, CommonFunc):
                 if not self.dragging:
                     self.item_selected = i
                     self.dragging = True
-                
-                # print(i)
-        # if actions["left"]:
-            
-        
-        # if actions["dragging"]:
-        #     print("yes")
-        #     for i in range(len(self.items_rect)):
-        #         if self.items_rect[i].collidepoint(pygame.mouse.get_pos()) and not self.dragging:
-        #             self.item_selected = i
-        #             self.dragging = actions["dragging"]
-        # else:
-        #     self.item_selected = -1
-        
-        # if event.type == pygame.MOUSEBUTTONDOWN:
-        #             self.dragging = True
-        #     print(2)
-        # elif event.type == pygame.MOUSEBUTTONUP:
-        #     self.dragging = False
-        #     self.item_selected = -1
-        
+
         self.game.reset_keys()
 
     def handleCollisionBulletAndMonster(self, display):
@@ -139,29 +126,19 @@ class Playground(State, CommonFunc):
                     
                     if self.dynamic_threats_list[j].HP < damage:
                         self.dynamic_threats_list = ThreatsObject.removeMonster(j, self.dynamic_threats_list)
-                        # drop meso
-                        mesoName = "meso1"
-                        if self.dynamic_threats_list[j].monster == "squid":
-                            mesoName = "meso3"
+                        # drop pike
+                        randProb = random.randint(0, 9)
+                        if randProb > 3:
+                            pikeName = "pike_drop"
+                            item = ItemObject(self.game, object2.x, object2.y, pikeName, 1)
+                            self.items_list.append(item)
                         
-                        meso = 0
-                        if mesoName == "meso1":
-                            meso = random.randint(50, 200)
-                        elif mesoName == "meso2":
-                            meso = random.randint(200, 500)
-                        elif mesoName == "meso3":
-                            meso = random.randint(500, 1000)
-                        elif mesoName == "meso4":
-                            meso = random.randint(1000, 5000)
-                            
-                        item = ItemObject(self.game, object2.x, object2.y, mesoName, meso)
-                        self.items_list.append(item)
                     else:
                         self.dynamic_threats_list[j].HP -= damage
                     
                     damage_string = str(damage)
                     damage_text = self.game.huge_font.render(damage_string, True, self.WHITE_COLOR.getColor(), self.ORANGE_COLOR.getColor())
-                    damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2, self.dynamic_threats_list[j].y_pos_ - 20)
+                    damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2 - self.dynamic_threats_list[j].map_x_[0], self.dynamic_threats_list[j].y_pos_ - 20 - self.dynamic_threats_list[j].map_y_[0])
                     display.blit(damage_text, damage_pos)
                     
                     
@@ -201,7 +178,15 @@ class Playground(State, CommonFunc):
                     elif "star_normal" in self.items_list[i].item_type:
                         self.items["star_normal"] += self.items_list[i].num
                     elif "star_special" in self.items_list[i].item_type:
-                        self.items["star_special"] += self.items_list[i].num    
+                        self.items["star_special"] += self.items_list[i].num 
+                    elif "key" in self.items_list[i].item_type:
+                        self.items["key"] += self.items_list[i].num 
+                    elif "sword" in self.items_list[i].item_type:
+                        self.items["sword"] += self.items_list[i].num 
+                    elif "pike" in self.items_list[i].item_type:
+                        self.items["pike"] += self.items_list[i].num 
+                    elif "wood" in self.items_list[i].item_type:
+                        self.items["wood"] += self.items_list[i].num    
                         
                     self.items_list.pop(i)
                     self.p_player.input_type_.pickUp_ = 0
@@ -265,26 +250,43 @@ class Playground(State, CommonFunc):
                         O_x = 1106
                         O_y += 47
 
+    def updateMap_data(self, map_data: list[Map]):
+        for i in range(len(map_data[0].tile)):
+            for j in range(len(map_data[0].tile[i])):
+                if map_data[0].tile[i][j] == 1009:
+                    map_data[0].tile[i][j] = 1005
+                if map_data[0].tile[i][j] == 1010:
+                    map_data[0].tile[i][j] = 1006
+                if map_data[0].tile[i][j] == 1011:
+                    map_data[0].tile[i][j] = 1007
+                if map_data[0].tile[i][j] == 1012:
+                    map_data[0].tile[i][j] = 1008
+        return map_data
+            
+
     def render(self, display):
         display.blit(self.img_background, (0,0))
         
-        self.game_map.loadMap(os.path.join(self.game.map_dir, "map.txt"))
+        if not self.setMap:
+            self.game_map.loadMap(os.path.join(self.game.map_dir, "map1.txt"))
+            self.setMap = True
         
         map_data = self.game_map.game_map_
-        
+
         self.p_player.doPlayer(map_data)
         
         self.p_player.setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
         self.game_map.setMap(map_data)
         self.game_map.drawMap(display)
         
+        self.p_player.show(display)
+            
         for i in range(len(self.dynamic_threats_list)):
             self.dynamic_threats_list[i].impMoveType()
             self.dynamic_threats_list[i].doPlayer(map_data)
             self.dynamic_threats_list[i].setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
             self.dynamic_threats_list[i].show(display)
-
-        self.p_player.show(display)
+        
         self.renderItems(display, map_data)
         
         self.p_player.handleBullet(display)
@@ -310,10 +312,34 @@ class Playground(State, CommonFunc):
             if  x1 >= 0 and x2 < map_data[0].max_map_x_ and \
                 y1 >= 0 and y2 < map_data[0].max_map_y_:
                 value_1 = map_data[0].tile[y1][x1]
-                if value_1 > self.MAP_TILE:
+                if value_1 > self.MAP_TILE and value_1 <= self.MAP_BACK_TILE:
                     self.exit_state()
                     self.p_player.input_type_.up_ = 0
+                elif value_1 > self.MAP_BACK_TILE and value_1 <= self.MAP_NEXT_TILE:
+                    new_state = Map2(self.game)
+                    new_state.enter_state()
+                    self.p_player.input_type_.up_ = 0
         
+        for i in range(len(self.items_list)):
+            if self.items_list[i].item_type == "pike_drop" and self.items_list[i].num > 20:
+                x1 = int(self.items_list[i].x_pos_ / self.TILE_SIZE)
+                x2 = int((self.items_list[i].x_pos_ + self.CHARACTER_WIDTH - 1) / self.TILE_SIZE)
+                
+                y1 = int(self.items_list[i].y_pos_ / self.TILE_SIZE)
+                y2 = int((self.items_list[i].y_pos_ + self.CHARACTER_HEIGHT - 1) / self.TILE_SIZE)
+                
+                if  x1 >= 0 and x2 < map_data[0].max_map_x_ and \
+                    y1 >= 0 and y2 < map_data[0].max_map_y_:
+                    value_1 = map_data[0].tile[y1][x1]
+                    if value_1 > self.MAP_NEXT_TILE:
+                        if not self.open_map:
+                            self.open_map = True
+                            self.timeToOpenMap = pygame.time.get_ticks()
+                        if self.open_map and (pygame.time.get_ticks() - self.timeToOpenMap) > 3000:
+                            map_data = self.updateMap_data(map_data)
+                            self.items_list.pop(i)
+                            break
+                        
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND
         

@@ -2,6 +2,8 @@ import pygame, os
 from states.State import State
 from states.OptionMenu import OptionMenu
 from states.Playground import Playground
+from states.Map1 import Map1
+from states.Map2 import Map2
 from states.Shop import Shop
 
 class Title(State):
@@ -14,7 +16,9 @@ class Title(State):
     def update(self, actions, screen):
         if actions["start"] or actions["left"] and self.start_box.collidepoint(pygame.mouse.get_pos()):
             # new_state = OptionMenu(self.game)
-            new_state = Playground(self.game)
+            # new_state = Map1(self.game)
+            new_state = Map2(self.game)
+            # new_state = Playground(self.game)
             new_state.enter_state()
         # elif actions["start"] or actions["left"] and self.shop_box.collidepoint(pygame.mouse.get_pos()):
         #     new_state = Shop(self.game)

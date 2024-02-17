@@ -1,3 +1,5 @@
+from RWFile import HandleFile
+
 class Rect:
     def __init__(self, x, y, w, h):
         self.x, self.y = x, y
@@ -36,6 +38,11 @@ class CommonFunc():
 
         self.BLANK_TILE = 0
         self.MAP_TILE = 1000
+        self.MAP_X_TILE = 500
+        
+        self.MAP_BACK_TILE = 1004
+        self.MAP_NEXT_TILE = 1008
+        
         self.TILE_SIZE = 60
 
         self.MAX_MAP_X = 25
@@ -44,14 +51,15 @@ class CommonFunc():
         
         self.type_move = {"static_threat": 0, "move_in_space_threat": 1}
         self.items = {"meso1": (21, 20), "meso2": (21, 20), "meso3": (21, 20), "meso4": (21, 20), 
-                      "HP_drop": (25, 25), "MP_drop": (25, 25), "star_normal_drop": (25, 25), "star_special_drop": (25, 25)}
+                      "HP_drop": (25, 25), "MP_drop": (25, 25), "star_normal_drop": (25, 25), "star_special_drop": (25, 25),
+                      "pike_drop": (25, 25), "sword_drop": (25, 25), "wood_drop": (25, 25), "key_drop": (25, 25)}
         
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
         self.MONSTER_SPEED = 4
         self.BULLET_SPEED = 16
         self.MAX_FALL_SPEED = 30
-        self.PLAYER_JUMP = 37
+        self.PLAYER_JUMP = 32
         self.DISTANCE_OF_BULLET = 400
         
         self.FRAME_PER_SECOND = 45      # fps

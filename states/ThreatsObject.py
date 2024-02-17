@@ -7,6 +7,8 @@ class ThreatsObject(State, CommonFunc):
         State.__init__(self, game)
         CommonFunc.__init__(self)
         
+        self.monsters = HandleFile.loadFile(self.game.monster_dir, "statsOfMonster.json")
+        
         self.x_val_ = 0
         self.y_val_ = 0
         self.x_pos_ = x_pos
@@ -22,15 +24,18 @@ class ThreatsObject(State, CommonFunc):
         self.frame_clip_ = []
         self.frame_ = 0
         
-        self.width_frame_ = 60
-        self.height_frame_ = 105
+        self.width_frame_ = self.monsters[monster]["width"]
+        self.height_frame_ = self.monsters[monster]["height"]
         
-        self.imageName = "left_" + str(monster)
         
+        self.HP = self.monsters[monster]["HP"]
         self.monster = monster
-        self.HP = 0
+        
+        self.imageName = ""
         if monster == "squid":
-            self.HP = 50
+            self.imageName = "left_" + str(monster)
+        elif monster == "boss":
+            self.imageName = str(monster) + "_left_"
         
         self.type_move_ = self.type_move["static_threat"]
         self.animation_a_ = 0
@@ -85,8 +90,6 @@ class ThreatsObject(State, CommonFunc):
         elif self.come_back_time_ > 0:
             self.come_back_time_ -= 1
             
-            self.checkToMap(map_data)
-            
             if self.come_back_time_ == 0:
                 self.initial()
     
@@ -103,13 +106,13 @@ class ThreatsObject(State, CommonFunc):
         y1 = int((self.y_pos_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + height_min - 1) / self.TILE_SIZE)
         
-        if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
+        if x1 >= 0 and x2 < map_data[0].max_map_x_ and y1 >= 0 and y2 < map_data[0].max_map_y_:
             if self.x_val_ > 0:
                 value_1 = map_data[0].tile[y1][x2]
                 value_2 = map_data[0].tile[y2][x2]
                 # print("value_1: ", value_1, "; value_2: ", value_2)
-                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_TILE) or \
-                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
+                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_X_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_X_TILE):
                     self.x_pos_ = x2 * self.TILE_SIZE
                     self.x_pos_ -= self.MONSTER_WIDTH + 1
                     self.x_val_ = 0
@@ -130,8 +133,8 @@ class ThreatsObject(State, CommonFunc):
             elif self.x_val_ < 0:
                 value_1 = map_data[0].tile[y1][x1]
                 value_2 = map_data[0].tile[y2][x1]
-                if (value_1 > self.BLANK_TILE and value_2 < self.MAP_TILE) or \
-                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
+                if (value_1 > self.BLANK_TILE and value_2 < self.MAP_X_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_X_TILE):
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.x_val_ = 0
                 if self.startTimeToStuck == -1:
@@ -157,9 +160,7 @@ class ThreatsObject(State, CommonFunc):
         y1 = int((self.y_pos_ + self.y_val_) / self.TILE_SIZE)
         y2 = int((self.y_pos_ + self.y_val_ + self.MONSTER_HEIGHT - 1) / self.TILE_SIZE)
         
-        # print(x1, y1, x2, y2)
-        
-        if x1 >= 0 and x2 < self.MAX_MAP_X and y1 >= 0 and y2 < self.MAX_MAP_Y:
+        if x1 >= 0 and x2 < map_data[0].max_map_x_ and y1 >= 0 and y2 < map_data[0].max_map_y_:
             if self.y_val_ > 0:
                 value_1 = map_data[0].tile[y2][x1]
                 value_2 = map_data[0].tile[y2][x2]
@@ -172,8 +173,8 @@ class ThreatsObject(State, CommonFunc):
             elif self.y_val_ < 0:
                 value_1 = map_data[0].tile[y1][x1]
                 value_2 = map_data[0].tile[y1][x2]
-                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_TILE) or \
-                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_TILE):
+                if (value_1 > self.BLANK_TILE and value_1 < self.MAP_X_TILE) or \
+                    (value_2 > self.BLANK_TILE and value_2 < self.MAP_X_TILE):
                     self.x_pos_ = (x1 + 1) * self.TILE_SIZE
                     self.y_val_ = 0
                     self.on_ground_ = False
@@ -213,7 +214,7 @@ class ThreatsObject(State, CommonFunc):
     def makeThreatsList(self):
         dynamic_threats_list: list[ThreatsObject] = []
         
-        for i in range(10):
+        for i in range(20):
             p_threat = ThreatsObject(self.game, 500 + i * 300, 200, "squid", self.id_monsters) 
             self.id_monsters += 1
             p_threat.animation_a_ = p_threat.x_pos_ - 200
@@ -222,6 +223,7 @@ class ThreatsObject(State, CommonFunc):
             p_threat.input_type_.left_ = 1
             dynamic_threats_list.append(p_threat)
         
+        print(self.id_monsters)
         # for i in range(10):
         #     p_threat = ThreatsObject(self.game, 700 + i * 1200, 200)
         #     p_threat.type_move_ = self.type_move["static_threat"]

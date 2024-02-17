@@ -1,6 +1,7 @@
 import pygame, os
 from states.State import State
 from states.Playground import Playground
+from states.Map1 import Map1
 from RWFile import HandleFile
 from states.CommonFunc import *
 from states.Character import Character
@@ -30,7 +31,7 @@ class OptionMenu(State, CommonFunc):
         self.BLACK_COLOR = ColorData(0, 0, 0)
         self.ORANGE_COLOR = ColorData(222, 138, 66)
         
-        self.vicious_box = pygame.Rect(670, 382, 170, 157)
+        self.vicious_box = pygame.Rect(500, 382, 170, 157)
         self.vicious_bg = pygame.image.load(os.path.join(self.game.char_dir, "vicious.png"))
         
         self.shop_bg = None
@@ -62,6 +63,14 @@ class OptionMenu(State, CommonFunc):
         self.MPItemSeller_box = pygame.Rect(759, 316, 306, 45)
         self.phitieu1ItemSeller_box = pygame.Rect(759, 366, 306, 45)
         self.phitieu2ItemSeller_box = pygame.Rect(759, 416, 306, 45)
+        
+        # Jay
+        self.jay_bg = pygame.image.load(os.path.join(self.game.char_dir, "jay.png"))
+        self.jay_box = pygame.Rect(815, 420, 125, 121)
+        
+        self.jay_message = None
+        self.yes_box = pygame.Rect(900, 465, 50, 20)
+        self.no_box = pygame.Rect(955, 465, 50, 20)
 
     def update(self, actions, screen):
         self.fps_timer.start()
@@ -135,6 +144,16 @@ class OptionMenu(State, CommonFunc):
             self.phitieu1_item_seller_bg = pygame.image.load(os.path.join(self.game.items_dir, "phitieu1_item_seller.png"))
             self.phitieu2_item_seller_bg = pygame.image.load(os.path.join(self.game.items_dir, "phitieu2_item_seller_active.png"))
         
+        if actions["left"] and self.jay_box.collidepoint(pygame.mouse.get_pos()):
+            self.jay_message = pygame.image.load(os.path.join(self.game.char_dir, "jay_message.png"))
+            
+        if actions["left"] and self.no_box.collidepoint(pygame.mouse.get_pos()):
+            self.jay_message = None
+            
+        if actions["left"] and self.yes_box.collidepoint(pygame.mouse.get_pos()):
+            new_state = Map1(self.game)
+            new_state.enter_state()
+        
         self.game.reset_keys()
         
     def renderShop(self, display):
@@ -177,7 +196,6 @@ class OptionMenu(State, CommonFunc):
 
     def render(self, display):
         display.blit(self.img_background, (0,0))
-        display.blit(self.vicious_bg, (670, 382))
         
         self.game_map.loadMap(os.path.join(self.game.map_dir, "henesys.txt"))
         
@@ -188,6 +206,12 @@ class OptionMenu(State, CommonFunc):
         self.p_player.setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
         self.game_map.setMap(map_data)
         self.game_map.drawMap(display)
+        
+        display.blit(self.vicious_bg, (500, 382))
+        display.blit(self.jay_bg, (815, 420))
+        
+        if self.jay_message:
+            display.blit(self.jay_message, (400, 210))
         
         self.p_player.show(display)
         
