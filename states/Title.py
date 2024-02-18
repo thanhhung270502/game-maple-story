@@ -16,9 +16,9 @@ class Title(State):
 
     def update(self, actions, screen):
         if actions["start"] or actions["left"] and self.start_box.collidepoint(pygame.mouse.get_pos()):
-            # new_state = OptionMenu(self.game)
+            new_state = OptionMenu(self.game)
             # new_state = Map1(self.game)
-            new_state = Map2(self.game)
+            # new_state = Map2(self.game)
             # new_state = Map3(self.game)
             # new_state = Playground(self.game)
             new_state.enter_state()
