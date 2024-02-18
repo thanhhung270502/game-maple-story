@@ -1,1 +1,1 @@
-{"HP": 92230, "HP_max": 100000, "MP": 400, "MP_max": 500, "EXP": 1500, "EXP_max": 10000, "meso": 134531324, "attack": 2000, "skill_1": {"level": 1, "damage": 30, "numOfMonsters": 1, "numOfHit": 2}, "skill_2": {"level": 10, "damage": 3000, "numOfMonsters": 2, "numOfHit": 1}, "level": 15, "bullet": "star_normal"}
+{"HP": 4200, "HP_max": 4200, "MP": 1695, "MP_max": 1880, "EXP": 1244, "EXP_max": 14606, "meso": 135065076, "attack": 2100, "point_skill": 1, "skill": {"level": 10, "damage": 1900, "mana": 57, "numOfMonsters": 4, "numOfHit": 1}, "level": 27, "bullet": "star_special"}

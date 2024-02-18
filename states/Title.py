@@ -4,6 +4,7 @@ from states.OptionMenu import OptionMenu
 from states.Playground import Playground
 from states.Map1 import Map1
 from states.Map2 import Map2
+from states.Map3 import Map3
 from states.Shop import Shop
 
 class Title(State):
@@ -18,6 +19,7 @@ class Title(State):
             # new_state = OptionMenu(self.game)
             # new_state = Map1(self.game)
             new_state = Map2(self.game)
+            # new_state = Map3(self.game)
             # new_state = Playground(self.game)
             new_state.enter_state()
         # elif actions["start"] or actions["left"] and self.shop_box.collidepoint(pygame.mouse.get_pos()):

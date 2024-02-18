@@ -25,6 +25,7 @@ class Map1(State, CommonFunc):
         self.setMap = False
         
         self.img_background = pygame.image.load(os.path.join(self.game.background_dir, "map1.png"))
+        self.pum_image = pygame.image.load(os.path.join(self.game.bullet_dir, "pum.png"))
         
         self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
         self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
@@ -56,6 +57,12 @@ class Map1(State, CommonFunc):
         self.drop = False
         
         self.close_bag_box = pygame.Rect(1268, 117, 19, 19)
+        
+        # SKILL
+        self.skills_bg = None
+        
+        self.close_skills_box = pygame.Rect(288, 117, 19, 19)
+        self.add_skills_box = pygame.Rect(294, 199, 15, 15)
         
         # Handle open new map
         self.open_map = False
@@ -89,6 +96,23 @@ class Map1(State, CommonFunc):
             self.item_selected = -1
             self.dragging = False
         
+        if actions["k_k"]:
+            if self.skills_bg:
+                self.skills_bg = None
+            else:
+                self.skills_bg = pygame.image.load(os.path.join(self.game.items_dir, "skills.png"))
+        
+        if actions["left"] and self.close_skills_box.collidepoint(pygame.mouse.get_pos()):
+            self.skills_bg = None
+        
+        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and self.stats["point_skill"] > 0:
+            self.stats["point_skill"] -= 1
+            self.stats["skill"]["level"] += 1
+            self.stats["skill"]["damage"] += 100
+            self.stats["skill"]["mana"] += 3
+            if self.stats["skill"]["level"] % 5  == 0:
+                self.stats["skill"]["numOfMonsters"] += 1
+        
         if actions["left"] and self.dragging:
             self.drop = True
         
@@ -100,6 +124,32 @@ class Map1(State, CommonFunc):
 
         self.game.reset_keys()
 
+    def updateExp(self, monster):
+        exp = 0
+        if monster == "squid":
+            exp = 400
+        elif monster == "boss":
+            exp = 100000
+        elif monster == "map1":
+            exp = 20000
+        elif monster == "map2":
+            exp = 50000
+            
+        while exp > 0:
+            if self.stats["EXP_max"] - self.stats["EXP"] > exp:
+                self.stats["EXP"] += exp
+                exp = 0
+            elif self.stats["EXP_max"] - self.stats["EXP"] <= exp:
+                exp -= self.stats["EXP_max"] - self.stats["EXP"]
+                self.stats["EXP"] = 0
+                self.stats["EXP_max"] = int(self.stats["EXP_max"] * 1.05)
+                self.stats["level"] += 1
+                self.stats["HP_max"] += 100
+                self.stats["HP"] = self.stats["HP_max"]
+                self.stats["MP_max"] += 40
+                self.stats["MP"] = self.stats["MP_max"]
+                self.stats["attack"] += 50
+
     def handleCollisionBulletAndMonster(self, display):
         for i in range(len(self.p_player.bullet_list_)):
             for j in range(len(self.dynamic_threats_list)):
@@ -108,24 +158,42 @@ class Map1(State, CommonFunc):
 
                 if CommonFunc.checkCollision(object1, object2):
                     damage = 0
+                    self.game.hit_sound.play()
+                    
+                    pum_pos = (self.p_player.bullet_list_[i].x_pos_ - self.dynamic_threats_list[j].map_x_[0], self.p_player.bullet_list_[i].y_pos_ - self.dynamic_threats_list[j].map_y_[0])
+                    display.blit(self.pum_image, pum_pos)
                     
                     if self.p_player.bullet_list_[i].name == "star_special":
                         if self.p_player.bullet_list_[i].skill == "ctrl":
                             damage = self.stats["attack"] + 15
                         elif self.p_player.bullet_list_[i].skill == "v":
-                            damage = self.stats["skill_2"]["damage"] + 15
+                            damage = self.stats["skill"]["damage"] + 15
 
                     elif self.p_player.bullet_list_[i].name == "star_normal":
                         if self.p_player.bullet_list_[i].skill == "ctrl":
                             damage = self.stats["attack"]
                         elif self.p_player.bullet_list_[i].skill == "v":
-                            damage = self.stats["skill_2"]["damage"]
+                            damage = self.stats["skill"]["damage"]
                     
                     if self.dynamic_threats_list[j].id in self.p_player.bullet_list_[i].numOfHitMonster:
                         continue
                     
+                    damage_string = str(damage)
+                    damage_text = self.game.huge_font.render(damage_string, True, self.WHITE_COLOR.getColor(), self.ORANGE_COLOR.getColor())
+                    damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2 - self.dynamic_threats_list[j].map_x_[0], self.dynamic_threats_list[j].y_pos_ - 20 - self.dynamic_threats_list[j].map_y_[0])
+                    display.blit(damage_text, damage_pos)
+                    
+                    if self.p_player.bullet_list_[i].numOfMonster == 1:
+                        self.p_player.bullet_list_ = self.p_player.removeBullet(i)
+                    else:
+                        self.p_player.bullet_list_[i].numOfHitMonster.append(self.dynamic_threats_list[j].id)
+                        self.p_player.bullet_list_[i].numOfMonster -= 1
+                    
                     if self.dynamic_threats_list[j].HP < damage:
+                        self.updateExp(self.dynamic_threats_list[j].monster)
+                        
                         self.dynamic_threats_list = ThreatsObject.removeMonster(j, self.dynamic_threats_list)
+                        
                         # drop pike
                         randProb = random.randint(0, 9)
                         if randProb > 3:
@@ -135,18 +203,6 @@ class Map1(State, CommonFunc):
                         
                     else:
                         self.dynamic_threats_list[j].HP -= damage
-                    
-                    damage_string = str(damage)
-                    damage_text = self.game.huge_font.render(damage_string, True, self.WHITE_COLOR.getColor(), self.ORANGE_COLOR.getColor())
-                    damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2 - self.dynamic_threats_list[j].map_x_[0], self.dynamic_threats_list[j].y_pos_ - 20 - self.dynamic_threats_list[j].map_y_[0])
-                    display.blit(damage_text, damage_pos)
-                    
-                    
-                    if self.p_player.bullet_list_[i].numOfMonster == 1:
-                        self.p_player.bullet_list_ = self.p_player.removeBullet(i)
-                    else:
-                        self.p_player.bullet_list_[i].numOfHitMonster.append(self.dynamic_threats_list[j].id)
-                        self.p_player.bullet_list_[i].numOfMonster -= 1
                     return
 
     def handleCollisionCharacterAndMonster(self):
@@ -194,6 +250,7 @@ class Map1(State, CommonFunc):
 
     def renderItems(self, display, map_data):
         for item in self.items_list:
+            item.doPlayer(map_data)
             item.setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
             item.show(display)
             
@@ -250,6 +307,22 @@ class Map1(State, CommonFunc):
                         O_x = 1106
                         O_y += 47
 
+    def renderSkills(self, display):
+        if not self.skills_bg: 
+            return
+        
+        display.blit(self.skills_bg, (120, 110))
+        
+        point_skill_string = str(self.stats["skill"]["level"])
+        point_skill_text = self.game.small_med_font.render(point_skill_string, True, self.BLACK_COLOR.getColor())
+        point_skill_pos = (177, 200)
+        display.blit(point_skill_text, point_skill_pos)
+        
+        point_skill_string = str(self.stats["point_skill"])
+        point_skill_text = self.game.small_med_font.render(point_skill_string, True, self.BLACK_COLOR.getColor())
+        point_skill_pos = (265, 416)
+        display.blit(point_skill_text, point_skill_pos)
+
     def updateMap_data(self, map_data: list[Map]):
         for i in range(len(map_data[0].tile)):
             for j in range(len(map_data[0].tile[i])):
@@ -262,10 +335,12 @@ class Map1(State, CommonFunc):
                 if map_data[0].tile[i][j] == 1012:
                     map_data[0].tile[i][j] = 1008
         return map_data
-            
 
     def render(self, display):
         display.blit(self.img_background, (0,0))
+        
+        self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
         
         if not self.setMap:
             self.game_map.loadMap(os.path.join(self.game.map_dir, "map1.txt"))
@@ -296,9 +371,8 @@ class Map1(State, CommonFunc):
         self.handleCollisionPickUp()
         
         self.renderBag(display)
+        self.renderSkills(display)
         
-        HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
-        HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
         
         Geometric.renderSpecifications(self, display)
         
@@ -316,6 +390,7 @@ class Map1(State, CommonFunc):
                     self.exit_state()
                     self.p_player.input_type_.up_ = 0
                 elif value_1 > self.MAP_BACK_TILE and value_1 <= self.MAP_NEXT_TILE:
+                    self.exit_state()
                     new_state = Map2(self.game)
                     new_state.enter_state()
                     self.p_player.input_type_.up_ = 0
@@ -338,8 +413,12 @@ class Map1(State, CommonFunc):
                         if self.open_map and (pygame.time.get_ticks() - self.timeToOpenMap) > 3000:
                             map_data = self.updateMap_data(map_data)
                             self.items_list.pop(i)
+                            self.updateExp("map1")
                             break
-                        
+        
+        HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
+        HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
+        
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND
         

@@ -28,7 +28,7 @@ class Game(CommonFunc):
                         "moveJump": False, "normalAttack": False, "pickUp": False,
                         "k_1": False, "k_2": False, "k_3": False, "k_4": False,
                         "k_c": False, "k_v": False, "k_b": False,
-                        "k_i": False, "dragging": False}
+                        "k_i": False, "dragging": False, "k_k": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
@@ -72,6 +72,7 @@ class Game(CommonFunc):
                     self.actions['normalAttack'] = True
                 if event.key == pygame.K_SPACE:
                     self.actions['moveJump'] = True
+                    self.jump_sound.play()
                 if event.key == pygame.K_z:
                     self.actions['pickUp'] = True
                 if event.key == pygame.K_UP:
@@ -92,6 +93,8 @@ class Game(CommonFunc):
                     self.actions["k_b"] = True
                 if event.key == pygame.K_i:
                     self.actions["k_i"] = True
+                if event.key == pygame.K_k:
+                    self.actions["k_k"] = True
                 self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -191,6 +194,9 @@ class Game(CommonFunc):
         self.punch_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "punch.wav"))
         self.explosion_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "explosion.wav"))
         self.wrong_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "wrong.mp3"))
+
+        self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "jump.mp3"))
+        self.hit_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "hit.mp3"))
 
         self.loginBackground_sound.play(loops=-1)
 

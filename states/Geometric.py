@@ -70,6 +70,7 @@ class Geometric:
         Geometric.renderRectangle(EXP_rect, ColorData(228, 242, 58), display, 3)
         
         exp_percent = float(self.stats["EXP"] / self.stats["EXP_max"])
+        exp_percent = round(exp_percent, 4) * 100
         EXP_string = "EXP : " + str(self.stats["EXP"]) + " [" + str(exp_percent) +  "%]" 
         EXP_text = self.small_font.render(EXP_string, True, self.WHITE_COLOR.getColor())
         EXP_position = (self.EXP_rect_.x, self.EXP_rect_.y - 12)

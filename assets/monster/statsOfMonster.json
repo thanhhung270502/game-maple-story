@@ -2,11 +2,18 @@
     "squid": {
         "width": 60,
         "height": 105,
-        "HP": 5000
+        "HP": 5000,
+        "attack": 30
     },
     "boss": {
-        "width": 150,
-        "height": 240,
-        "HP": 50000
+        "width": 200,
+        "height": 350,
+        "HP": 50000,
+        "attack": 150
+    },
+    "box": {
+        "width": 60,
+        "height": 50,
+        "HP": 4
     }
 }
