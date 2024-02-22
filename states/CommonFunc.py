@@ -62,7 +62,7 @@ class CommonFunc():
         self.PLAYER_JUMP = 32
         self.DISTANCE_OF_BULLET = 400
         
-        self.FRAME_PER_SECOND = 45      # fps
+        self.FRAME_PER_SECOND = 1000      # fps
         
         self.id_monsters = 0
         
@@ -76,6 +76,8 @@ class CommonFunc():
         self.MP_rect_ = Rect(225, 696, 120, 20)
         self.EXP_rect_ = Rect(355, 696, 120, 20)
         self.LEVEL_rect_ = Rect(5, 685, 80, 30)
+        
+        self.bossHP_rect_ = Rect(800, 0, 700, 30)
         
     def checkCollision(object1: Rect, object2: Rect):
         left_a = object1.x

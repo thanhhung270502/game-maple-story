@@ -76,8 +76,6 @@ class Character(State, CommonFunc):
                 self.imageName = "jumpRight"
 
     def handleInputAction(self, actions):
-        self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
-        self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
         
         if actions["moveLeft"]:
             self.status_ = self.move["left"]
@@ -96,45 +94,56 @@ class Character(State, CommonFunc):
         else:
             self.input_type_.jump_ = 0
 
-        if actions["normalAttack"] and self.items[self.stats["bullet"]] > 0:
-            self.items[self.stats["bullet"]] -= 1
-            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_, self.stats["bullet"], "ctrl", 1)
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        if actions["normalAttack"] and items[stats["bullet"]] > 0:
+            items[stats["bullet"]] -= 1
+            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 2), self.status_, stats["bullet"], "ctrl", 1)
             bullet.is_move_ = True
             self.bullet_list_.append(bullet)
-        elif actions["k_v"] and self.stats["MP"] >= self.stats["skill"]["mana"] and self.items[self.stats["bullet"]] > 0:
-            self.stats["MP"] -= self.stats["skill"]["mana"]
-            self.items[self.stats["bullet"]] -= 1
+        
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
+        elif actions["k_v"] and stats["MP"] >= stats["skill"]["mana"] and items[stats["bullet"]] > 0:
+            stats["MP"] -= stats["skill"]["mana"]
+            items[stats["bullet"]] -= 1
             
-            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 3), self.status_, self.stats["bullet"], "v", self.stats["skill"]["numOfMonsters"])
+            bullet = Bullet(self.game, self.x_pos_ + int(self.CHARACTER_WIDTH / 2), self.y_pos_ + int(self.CHARACTER_HEIGHT / 3), self.status_, stats["bullet"], "v", stats["skill"]["numOfMonsters"])
             bullet.is_move_ = True
             self.bullet_list_.append(bullet)
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
         
         
         if actions["k_3"]:
-            self.stats["bullet"] = "star_normal"
+            stats["bullet"] = "star_normal"
             
         elif actions["k_4"]:
-            self.stats["bullet"] = "star_special"
+            stats["bullet"] = "star_special"
         
-        if actions["k_1"] and self.items["HP"] > 0:
-            self.items["HP"] -= 1
-            self.stats["HP"] += 200
-            if self.stats["HP"] > self.stats["HP_max"]:
-                self.stats["HP"] = self.stats["HP_max"]
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        if actions["k_1"] and items["HP"] > 0:
+            items["HP"] -= 1
+            stats["HP"] += 200
+            if stats["HP"] > stats["HP_max"]:
+                stats["HP"] = stats["HP_max"]
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
         
-        if actions["k_2"] and self.items["MP"] > 0:
-            self.items["MP"] -= 1
-            self.stats["MP"] += 100
-            if self.stats["MP"] > self.stats["MP_max"]:
-                self.stats["MP"] = self.stats["MP_max"]
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        if actions["k_2"] and items["MP"] > 0:
+            items["MP"] -= 1
+            stats["MP"] += 100
+            if stats["MP"] > stats["MP_max"]:
+                stats["MP"] = stats["MP_max"]
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
         
         if actions["pickUp"]:
             self.input_type_.pickUp_ = 1
         else:
             self.input_type_.pickUp_ = 0
-        
-        HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
-        HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
 
     def handleBullet(self, display):
         length = len(self.bullet_list_)

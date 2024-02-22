@@ -16,10 +16,6 @@ class Map2(State, CommonFunc):
         State.__init__(self,game)
         CommonFunc.__init__(self)
         
-        self.game.loginBackground_sound.stop()
-        self.game.background_sound.stop()
-        self.game.background_sound.play(loops=-1)
-        
         self.game = game
         
         self.setMap = False
@@ -180,6 +176,7 @@ class Map2(State, CommonFunc):
                 self.stats["MP_max"] += 40
                 self.stats["MP"] = self.stats["MP_max"]
                 self.stats["attack"] += 50
+                self.stats["point_skill"] += 1
 
     def handleCollisionBulletAndMonster(self, display):
         for i in range(len(self.p_player.bullet_list_)):
@@ -412,6 +409,10 @@ class Map2(State, CommonFunc):
                     self.p_player.input_type_.up_ = 0
                 elif value_1 > self.MAP_BACK_TILE and value_1 <= self.MAP_NEXT_TILE:
                     self.exit_state()
+                    
+                    self.game.map2_sound.stop()
+                    self.game.map3_sound.play(loops=-1)
+                    
                     new_state = Map3(self.game)
                     new_state.enter_state()
                     self.p_player.input_type_.up_ = 0
@@ -446,4 +447,4 @@ class Map2(State, CommonFunc):
         if (real_imp_time < time_one_frame):
             delay_time = time_one_frame - real_imp_time
             if delay_time > 0:
-                pygame.time.delay(int(delay_time + 0))
+                pygame.time.delay(int(delay_time ))

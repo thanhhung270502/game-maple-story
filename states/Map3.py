@@ -15,10 +15,6 @@ class Map3(State, CommonFunc):
         State.__init__(self,game)
         CommonFunc.__init__(self)
         
-        self.game.loginBackground_sound.stop()
-        self.game.background_sound.stop()
-        self.game.background_sound.play(loops=-1)
-        
         self.game = game
         
         self.setMap = False
@@ -28,6 +24,7 @@ class Map3(State, CommonFunc):
         
         self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
         self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        self.monsters = HandleFile.loadFile(self.game.monster_dir, "statsOfMonster.json")
         
         self.game_map = GameMap(game)
         self.p_player = Character(game)
@@ -68,12 +65,17 @@ class Map3(State, CommonFunc):
         self.add_skills_box = pygame.Rect(294, 199, 15, 15)
         
         self.back_map = False
+        
+        # BOSS
+        self.boss_image = pygame.image.load(os.path.join(self.game.monster_dir, "boss_img.png"))
+        self.boss_spam_monster = 0
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
         # if actions["pause"]:
         #     new_state = PauseMenu(self.game)
         #     new_state.enter_state()
+        
         self.fps_timer.start()
         self.p_player.handleInputAction(actions)
         
@@ -106,6 +108,7 @@ class Map3(State, CommonFunc):
                     self.item_selected = i
                     self.dragging = True
 
+        # SKILL
         if actions["k_k"]:
             if self.skills_bg:
                 self.skills_bg = None
@@ -115,13 +118,16 @@ class Map3(State, CommonFunc):
         if actions["left"] and self.close_skills_box.collidepoint(pygame.mouse.get_pos()):
             self.skills_bg = None
         
-        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and self.stats["point_skill"] > 0:
-            self.stats["point_skill"] -= 1
-            self.stats["skill"]["level"] += 1
-            self.stats["skill"]["damage"] += 100
-            self.stats["skill"]["mana"] += 3
-            if self.stats["skill"]["level"] % 5  == 0:
-                self.stats["skill"]["numOfMonsters"] += 1
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and stats["point_skill"] > 0:
+            print("Y")
+            stats["point_skill"] -= 1
+            stats["skill"]["level"] += 1
+            stats["skill"]["damage"] += 100
+            stats["skill"]["mana"] += 3
+            if stats["skill"]["level"] % 5  == 0:
+                stats["skill"]["numOfMonsters"] += 1
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
         
         self.game.reset_keys()
 
@@ -150,7 +156,7 @@ class Map3(State, CommonFunc):
                 self.stats["MP_max"] += 40
                 self.stats["MP"] = self.stats["MP_max"]
                 self.stats["attack"] += 50
-
+                self.stats["point_skill"] += 1
 
     def handleCollisionBulletAndMonster(self, display):
         for i in range(len(self.p_player.bullet_list_)):
@@ -185,59 +191,60 @@ class Map3(State, CommonFunc):
                     damage_pos = (self.dynamic_threats_list[j].x_pos_ + self.MONSTER_WIDTH / 2 - self.dynamic_threats_list[j].map_x_[0], self.dynamic_threats_list[j].y_pos_ - 20 - self.dynamic_threats_list[j].map_y_[0])
                     display.blit(damage_text, damage_pos)
                     
+                    if self.p_player.bullet_list_[i].numOfMonster == 1:
+                        self.p_player.bullet_list_ = self.p_player.removeBullet(i)
+                    else:
+                        self.p_player.bullet_list_[i].numOfHitMonster.append(self.dynamic_threats_list[j].id)
+                        self.p_player.bullet_list_[i].numOfMonster -= 1
+                        
                     if self.dynamic_threats_list[j].HP < damage:
                         self.updateExp(self.dynamic_threats_list[j].monster)
                         
+                        if self.dynamic_threats_list[j].monster == "boss":
+                            # drop pike
+                            randNum = random.randint(100, 200)
+                            itemName = "HP_drop"
+                            O_x = object2.x - 400
+                            if O_x < 0:
+                                O_x = 0
+                            item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
+                            self.items_list.append(item)
+                            
+                            randNum = random.randint(100, 200)
+                            itemName = "MP_drop"
+                            O_x = object2.x - 200
+                            if O_x < 0:
+                                O_x = 200
+                            item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
+                            self.items_list.append(item)
+                            
+                            randNum = random.randint(50000, 200000)
+                            itemName = "meso4"
+                            O_x = object2.x
+                            item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
+                            self.items_list.append(item)
+                            
+                            randNum = random.randint(500, 1000)
+                            itemName = "star_normal_drop"
+                            O_x = object2.x + 200
+                            if O_x > 1400:
+                                O_x = 1200
+                            item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
+                            self.items_list.append(item)
+                            
+                            randNum = random.randint(500, 1000)
+                            itemName = "star_special_drop"
+                            O_x = object2.x + 400
+                            if O_x > 1400:
+                                O_x = 1400
+                            item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
+                            self.items_list.append(item)
+                            self.back_map = True
+                            
                         self.dynamic_threats_list = ThreatsObject.removeMonster(j, self.dynamic_threats_list)
-                        
-                        # drop pike
-                        randNum = random.randint(100, 200)
-                        itemName = "HP_drop"
-                        O_x = object2.x - 400
-                        if O_x < 0:
-                            O_x = 0
-                        item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
-                        self.items_list.append(item)
-                        
-                        randNum = random.randint(100, 200)
-                        itemName = "MP_drop"
-                        O_x = object2.x - 200
-                        if O_x < 0:
-                            O_x = 200
-                        item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
-                        self.items_list.append(item)
-                        
-                        randNum = random.randint(50000, 200000)
-                        itemName = "meso4"
-                        O_x = object2.x
-                        item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
-                        self.items_list.append(item)
-                        
-                        randNum = random.randint(500, 1000)
-                        itemName = "star_normal_drop"
-                        O_x = object2.x + 200
-                        if O_x > 1400:
-                            O_x = 1200
-                        item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
-                        self.items_list.append(item)
-                        
-                        randNum = random.randint(500, 1000)
-                        itemName = "star_special_drop"
-                        O_x = object2.x + 400
-                        if O_x > 1400:
-                            O_x = 1400
-                        item = ItemObject(self.game, O_x, object2.y, itemName, randNum)
-                        self.items_list.append(item)
-                        
-                        self.back_map = True
                     else:
                         self.dynamic_threats_list[j].HP -= damage
                     
-                    # if self.p_player.bullet_list_[i].numOfMonster == 1:
-                    #     self.p_player.bullet_list_ = self.p_player.removeBullet(i)
-                    # else:
-                    #     self.p_player.bullet_list_[i].numOfHitMonster.append(self.dynamic_threats_list[j].id)
-                    #     self.p_player.bullet_list_[i].numOfMonster -= 1
                     return
 
     def handleCollisionCharacterAndMonster(self):
@@ -248,7 +255,7 @@ class Map3(State, CommonFunc):
             if CommonFunc.checkCollision(object1, object2):
                 currentTime = pygame.time.get_ticks() - self.startTimeToCollision
                 if currentTime >= 2000:
-                    self.stats["HP"] -= 10
+                    self.stats["HP"] -= self.dynamic_threats_list[i].attack
                     self.startTimeToCollision = pygame.time.get_ticks()
                     return
 
@@ -410,6 +417,21 @@ class Map3(State, CommonFunc):
             self.dynamic_threats_list[i].doPlayer(map_data)
             self.dynamic_threats_list[i].setMapXY(map_data[0].start_x_[0], map_data[0].start_y_[0])
             self.dynamic_threats_list[i].show(display)
+            if self.dynamic_threats_list[i].monster == "boss":
+                Geometric.renderHPBoss(self, display, self.dynamic_threats_list[i])
+                if self.dynamic_threats_list[i].HP < self.monsters["boss"]["HP"] / 4:
+                    if self.boss_spam_monster == 2:
+                        ThreatsObject.spamMonster(self, self.dynamic_threats_list)
+                        self.boss_spam_monster += 1
+                elif self.dynamic_threats_list[i].HP < self.monsters["boss"]["HP"] / 3:
+                    if self.boss_spam_monster == 1:
+                        ThreatsObject.spamMonster(self, self.dynamic_threats_list)
+                        self.boss_spam_monster += 1
+                elif self.dynamic_threats_list[i].HP < self.monsters["boss"]["HP"] / 2:
+                    if self.boss_spam_monster == 0:
+                        ThreatsObject.spamMonster(self, self.dynamic_threats_list)
+                        self.boss_spam_monster += 1
+                    
         
         self.renderItems(display, map_data)
         

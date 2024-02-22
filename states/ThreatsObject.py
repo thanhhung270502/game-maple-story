@@ -27,6 +27,7 @@ class ThreatsObject(State, CommonFunc):
         self.width_frame_ = self.monsters[monster]["width"]
         self.height_frame_ = self.monsters[monster]["height"]
         
+        self.attack = self.monsters[monster]["attack"]
         
         self.HP = self.monsters[monster]["HP"]
         self.monster = monster
@@ -214,14 +215,23 @@ class ThreatsObject(State, CommonFunc):
                 if self.x_pos_ > self.animation_b_:
                     self.input_type_.left_ = 1
                     self.input_type_.right_ = 0
-                    self.imageName = "left_squid"
+                    if self.monster == "squid":
+                        self.imageName = "left_squid"
+                    elif self.monster == "boss":
+                        self.imageName = "boss_left_"
                 elif self.x_pos_ < self.animation_a_:
                     self.input_type_.left_ = 0
                     self.input_type_.right_ = 1
-                    self.imageName = "right_squid"
+                    if self.monster == "squid":
+                        self.imageName = "right_squid"
+                    elif self.monster == "boss":
+                        self.imageName = "boss_right_"
             else:
                 if self.input_type_.left_ == 1:
-                    self.imageName = "left_squid"
+                    if self.monster == "squid":
+                        self.imageName = "left_squid"
+                    elif self.monster == "boss":
+                        self.imageName = "boss_left_"
     
     def makeThreatsList(self):
         dynamic_threats_list: list[ThreatsObject] = []
@@ -278,7 +288,20 @@ class ThreatsObject(State, CommonFunc):
         dynamic_threats_list.append(p_threat)
         
         return dynamic_threats_list
+    
+    def spamMonster(self, monsters_list):
+        for i in range(10):
+            p_threat = ThreatsObject(self.game, 200 + i * 100, 200, "squid", self.id_monsters) 
+            self.id_monsters += 1
+            p_threat.animation_a_ = p_threat.x_pos_ - 400
+            p_threat.animation_b_ = p_threat.x_pos_ + 400
+            p_threat.type_move_ = self.type_move["move_in_space_threat"]
+            p_threat.input_type_.left_ = 1
+            monsters_list.append(p_threat)
         
+        return monsters_list
+
+    
     def removeMonster(index, dynamic_threats_list):
         size = len(dynamic_threats_list)
         if size > 0 and index < size:

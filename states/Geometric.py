@@ -28,7 +28,6 @@ class Geometric:
     def renderOutline(geo_size: Rect, color_data: ColorData, display, border_size, border_width): 
         pygame.draw.rect(display, color_data.getColor(), geo_size.getRect(), border_width, -1, border_size, -1, border_size, -1)
     
-    
     def renderSpecifications(self, display):
         self.small_font = pygame.font.SysFont("Arial", 10, True)
         self.medium_font = pygame.font.SysFont("Arial", 15, True)
@@ -87,3 +86,13 @@ class Geometric:
         # Footbar
         footbar_image = pygame.image.load(os.path.join(self.game.background_dir, "footbar.png"))
         display.blit(footbar_image, (485, 678))
+    
+    def renderHPBoss(self, display, boss):
+        display.blit(self.boss_image, (725, 0))
+        Geometric.renderRectangle(self.bossHP_rect_, ColorData(255, 255, 255), display, 5)
+        
+        HP_rect = self.bossHP_rect_.copy()
+        print(boss.HP, self.monsters["boss"]["HP"])
+        if boss.HP < self.monsters["boss"]["HP"]:
+            HP_rect.w = int((boss.HP / self.monsters["boss"]["HP"]) * 800)
+        Geometric.renderRectangle(HP_rect, ColorData(206, 0, 0), display, 5)

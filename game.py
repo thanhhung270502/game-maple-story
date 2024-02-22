@@ -194,6 +194,10 @@ class Game(CommonFunc):
         self.punch_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "punch.wav"))
         self.explosion_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "explosion.wav"))
         self.wrong_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "wrong.mp3"))
+        
+        self.map1_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "map1.mp3"))
+        self.map2_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "map2.mp3"))
+        self.map3_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "map3.mp3"))
 
         self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "jump.mp3"))
         self.hit_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, "hit.mp3"))

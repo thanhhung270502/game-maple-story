@@ -91,6 +91,9 @@ class OptionMenu(State, CommonFunc):
         self.add_skills_box = pygame.Rect(294, 199, 15, 15)
 
     def update(self, actions, screen):
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        
         self.fps_timer.start()
         self.p_player.handleInputAction(actions)
         
@@ -165,32 +168,32 @@ class OptionMenu(State, CommonFunc):
             self.phitieu2_item_seller_bg = pygame.image.load(os.path.join(self.game.items_dir, "phitieu2_item_seller_active.png"))
         
         if actions["left"] and self.buyItem_box.collidepoint(pygame.mouse.get_pos()):
-            if self.item_buyer == "HP" and self.stats["meso"] > 500:
-                self.items["HP"] += 1
-                self.stats["meso"] -= 500
-            if self.item_buyer == "MP" and self.stats["meso"] > 1000:
-                self.items["MP"] += 1
-                self.stats["meso"] -= 1000
-            if self.item_buyer == "star_normal" and self.stats["meso"] > 1000:
-                self.items["star_normal"] += 50
-                self.stats["meso"] -= 1000
-            if self.item_buyer == "star_special" and self.stats["meso"] > 2000:
-                self.items["star_special"] += 50
-                self.stats["meso"] -= 2000
+            if self.item_buyer == "HP" and stats["meso"] > 500:
+                items["HP"] += 1
+                stats["meso"] -= 500
+            if self.item_buyer == "MP" and stats["meso"] > 1000:
+                items["MP"] += 1
+                stats["meso"] -= 1000
+            if self.item_buyer == "star_normal" and stats["meso"] > 1000:
+                items["star_normal"] += 50
+                stats["meso"] -= 1000
+            if self.item_buyer == "star_special" and stats["meso"] > 2000:
+                items["star_special"] += 50
+                stats["meso"] -= 2000
         
         if actions["left"] and self.sellItem_box.collidepoint(pygame.mouse.get_pos()):
-            if self.item_seller == "HP" and self.stats["HP"] > 0:
-                self.items["HP"] -= 1
-                self.stats["meso"] += 250
-            if self.item_seller == "MP" and self.stats["MP"] > 0:
-                self.items["MP"] -= 1
-                self.stats["meso"] += 500
-            if self.item_seller == "star_normal" and self.stats["meso"] > 1000:
-                self.items["star_normal"] -= 50
-                self.stats["meso"] += 500
-            if self.item_seller == "star_special" and self.stats["meso"] > 2000:
-                self.items["star_special"] -= 50
-                self.stats["meso"] += 1000
+            if self.item_seller == "HP" and stats["HP"] > 0:
+                items["HP"] -= 1
+                stats["meso"] += 250
+            if self.item_seller == "MP" and stats["MP"] > 0:
+                items["MP"] -= 1
+                stats["meso"] += 500
+            if self.item_seller == "star_normal" and stats["meso"] > 1000:
+                items["star_normal"] -= 50
+                stats["meso"] += 500
+            if self.item_seller == "star_special" and stats["meso"] > 2000:
+                items["star_special"] -= 50
+                stats["meso"] += 1000
             
         # Bag
         if actions["k_i"]:
@@ -226,13 +229,13 @@ class OptionMenu(State, CommonFunc):
         if actions["left"] and self.close_skills_box.collidepoint(pygame.mouse.get_pos()):
             self.skills_bg = None
         
-        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and self.stats["point_skill"] > 0:
-            self.stats["point_skill"] -= 1
-            self.stats["skill"]["level"] += 1
-            self.stats["skill"]["damage"] += 100
-            self.stats["skill"]["mana"] += 3
-            if self.stats["skill"]["level"] % 5  == 0:
-                self.stats["skill"]["numOfMonsters"] += 1
+        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and stats["point_skill"] > 0:
+            stats["point_skill"] -= 1
+            stats["skill"]["level"] += 1
+            stats["skill"]["damage"] += 100
+            stats["skill"]["mana"] += 3
+            if stats["skill"]["level"] % 5  == 0:
+                stats["skill"]["numOfMonsters"] += 1
         
         
         # Jay
@@ -243,12 +246,14 @@ class OptionMenu(State, CommonFunc):
             self.jay_message = None
             
         if actions["left"] and self.yes_box.collidepoint(pygame.mouse.get_pos()):
+            self.jay_message = None
+            self.game.background_sound.stop()
+            self.game.map1_sound.play(loops=-1)
             new_state = Map1(self.game)
             new_state.enter_state()
             
-        HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
-        HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
-        
+        HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+        HandleFile.saveFile(self.game.char_dir, "items.json", items)
         self.game.reset_keys()
     
     def handleCollisionPickUp(self):
@@ -257,29 +262,34 @@ class OptionMenu(State, CommonFunc):
             for i in range(len(self.items_list)):
                 object2 = Rect(self.items_list[i].x_pos_, self.items_list[i].y_pos_, self.items_list[i].width_frame_, self.items_list[i].height_frame_)
                 if CommonFunc.checkCollision(object1, object2):
+                    stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+                    items = HandleFile.loadFile(self.game.char_dir, "items.json")
                     if "meso" in self.items_list[i].item_type:
-                        self.stats["meso"] += self.items_list[i].num
+                        stats["meso"] += self.items_list[i].num
                         
                     # else:
                     elif "HP" in self.items_list[i].item_type:
-                        self.items["HP"] += self.items_list[i].num
+                        items["HP"] += self.items_list[i].num
                     elif "MP" in self.items_list[i].item_type:
-                        self.items["MP"] += self.items_list[i].num
+                        items["MP"] += self.items_list[i].num
                     elif "star_normal" in self.items_list[i].item_type:
-                        self.items["star_normal"] += self.items_list[i].num
+                        items["star_normal"] += self.items_list[i].num
                     elif "star_special" in self.items_list[i].item_type:
-                        self.items["star_special"] += self.items_list[i].num 
+                        items["star_special"] += self.items_list[i].num 
                     elif "key" in self.items_list[i].item_type:
-                        self.items["key"] += self.items_list[i].num 
+                        items["key"] += self.items_list[i].num 
                     elif "sword" in self.items_list[i].item_type:
-                        self.items["sword"] += self.items_list[i].num 
+                        items["sword"] += self.items_list[i].num 
                     elif "pike" in self.items_list[i].item_type:
-                        self.items["pike"] += self.items_list[i].num 
+                        items["pike"] += self.items_list[i].num 
                     elif "wood" in self.items_list[i].item_type:
-                        self.items["wood"] += self.items_list[i].num    
+                        items["wood"] += self.items_list[i].num    
                         
                     self.items_list.pop(i)
                     self.p_player.input_type_.pickUp_ = 0
+                    
+                    HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+                    HandleFile.saveFile(self.game.char_dir, "items.json", items)
                     return
 
     def renderItems(self, display, map_data):
@@ -328,9 +338,11 @@ class OptionMenu(State, CommonFunc):
 
     def renderBag(self, display):
         if self.bag_bg:
+            stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+            items = HandleFile.loadFile(self.game.char_dir, "items.json")
             display.blit(self.bag_bg, (1100, 110))
             
-            meso_string = CommonFunc.chuyen_chuoi_thanh_chuoi_dinh_dang_so(str(self.stats["meso"]))
+            meso_string = CommonFunc.chuyen_chuoi_thanh_chuoi_dinh_dang_so(str(stats["meso"]))
             meso_text = self.game.medium_font.render(meso_string, True, self.BLACK_COLOR.getColor())
             meso_pos = (1152, 414)
             display.blit(meso_text, meso_pos)            
@@ -340,8 +352,8 @@ class OptionMenu(State, CommonFunc):
             index = 0
             self.items_bag_rect = []
             self.items_rect = []
-            for key in self.items:
-                if self.items[key] != 0:
+            for key in items:
+                if items[key] != 0:
                     
                     item_rect = Rect(O_x, O_y - 33, 45, 45)
                     self.items_bag_rect.append(item_rect)
@@ -356,8 +368,8 @@ class OptionMenu(State, CommonFunc):
                             self.dragging = False
                             self.item_selected = -1
                             self.drop = False
-                            item_drop = ItemObject(self.game, self.p_player.x_pos_, self.p_player.y_pos_ - 35, key + "_drop", self.items[key])
-                            self.items[key] = 0
+                            item_drop = ItemObject(self.game, self.p_player.x_pos_, self.p_player.y_pos_ - 35, key + "_drop", items[key])
+                            items[key] = 0
                             self.items_list.append(item_drop)
                             continue
                         else:
@@ -368,7 +380,7 @@ class OptionMenu(State, CommonFunc):
                     pos = (item_rect.x, item_rect.y)
                     display.blit(image, pos)
                     
-                    string = str(self.items[key])
+                    string = str(items[key])
                     text = self.game.small_med_font.render(string, True, self.BLACK_COLOR.getColor())
                     pos = (O_x, O_y)
                     O_x += 47
@@ -378,6 +390,9 @@ class OptionMenu(State, CommonFunc):
                     if index % 4 == 0:
                         O_x = 1106
                         O_y += 47
+
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
 
     def renderSkills(self, display):
         if not self.skills_bg: 
@@ -428,6 +443,8 @@ class OptionMenu(State, CommonFunc):
         self.renderBag(display)
         self.renderSkills(display)
         
+        self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
         Geometric.renderSpecifications(self, display)
         
         if self.p_player.input_type_.up_ == 1:
@@ -457,4 +474,4 @@ class OptionMenu(State, CommonFunc):
         if (real_imp_time < time_one_frame):
             delay_time = time_one_frame - real_imp_time
             if delay_time > 0:
-                pygame.time.delay(int(delay_time + 50))
+                pygame.time.delay(int(delay_time))

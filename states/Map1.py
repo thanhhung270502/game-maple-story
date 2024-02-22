@@ -16,10 +16,6 @@ class Map1(State, CommonFunc):
         State.__init__(self,game)
         CommonFunc.__init__(self)
         
-        self.game.loginBackground_sound.stop()
-        self.game.background_sound.stop()
-        self.game.background_sound.play(loops=-1)
-        
         self.game = game
         
         self.setMap = False
@@ -105,14 +101,15 @@ class Map1(State, CommonFunc):
         if actions["left"] and self.close_skills_box.collidepoint(pygame.mouse.get_pos()):
             self.skills_bg = None
         
-        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and self.stats["point_skill"] > 0:
-            self.stats["point_skill"] -= 1
-            self.stats["skill"]["level"] += 1
-            self.stats["skill"]["damage"] += 100
-            self.stats["skill"]["mana"] += 3
-            if self.stats["skill"]["level"] % 5  == 0:
-                self.stats["skill"]["numOfMonsters"] += 1
-        
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and stats["point_skill"] > 0:
+            stats["point_skill"] -= 1
+            stats["skill"]["level"] += 1
+            stats["skill"]["damage"] += 100
+            stats["skill"]["mana"] += 3
+            if stats["skill"]["level"] % 5  == 0:
+                stats["skill"]["numOfMonsters"] += 1
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
         if actions["left"] and self.dragging:
             self.drop = True
         
@@ -149,6 +146,20 @@ class Map1(State, CommonFunc):
                 self.stats["MP_max"] += 40
                 self.stats["MP"] = self.stats["MP_max"]
                 self.stats["attack"] += 50
+                self.stats["point_skill"] += 1
+
+    def handleIncreaseMonsters(self):
+        if len(self.dynamic_threats_list) > 10:
+            return
+        
+        for i in range(10):
+            p_threat = ThreatsObject(self.game, 500 + i * 300, 200, "squid", self.id_monsters) 
+            self.id_monsters += 1
+            p_threat.animation_a_ = p_threat.x_pos_ - 200
+            p_threat.animation_b_ = p_threat.x_pos_ + 200
+            p_threat.type_move_ = self.type_move["move_in_space_threat"]
+            p_threat.input_type_.left_ = 1
+            self.dynamic_threats_list.append(p_threat)
 
     def handleCollisionBulletAndMonster(self, display):
         for i in range(len(self.p_player.bullet_list_)):
@@ -213,7 +224,7 @@ class Map1(State, CommonFunc):
             if CommonFunc.checkCollision(object1, object2):
                 currentTime = pygame.time.get_ticks() - self.startTimeToCollision
                 if currentTime >= 2000:
-                    self.stats["HP"] -= 10
+                    self.stats["HP"] -= self.dynamic_threats_list[i].attack
                     self.startTimeToCollision = pygame.time.get_ticks()
                     return
 
@@ -355,6 +366,8 @@ class Map1(State, CommonFunc):
         self.game_map.drawMap(display)
         
         self.p_player.show(display)
+        
+        self.handleIncreaseMonsters()
             
         for i in range(len(self.dynamic_threats_list)):
             self.dynamic_threats_list[i].impMoveType()
@@ -391,6 +404,8 @@ class Map1(State, CommonFunc):
                     self.p_player.input_type_.up_ = 0
                 elif value_1 > self.MAP_BACK_TILE and value_1 <= self.MAP_NEXT_TILE:
                     self.exit_state()
+                    self.game.map1_sound.stop()
+                    self.game.map2_sound.play(loops=-1)
                     new_state = Map2(self.game)
                     new_state.enter_state()
                     self.p_player.input_type_.up_ = 0
@@ -425,4 +440,4 @@ class Map1(State, CommonFunc):
         if (real_imp_time < time_one_frame):
             delay_time = time_one_frame - real_imp_time
             if delay_time > 0:
-                pygame.time.delay(int(delay_time + 0))
+                pygame.time.delay(int(delay_time))
