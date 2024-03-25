@@ -88,7 +88,7 @@ class Geometric:
         display.blit(footbar_image, (485, 678))
     
     def renderHPBoss(self, display, boss):
-        display.blit(self.boss_image, (725, 0))
+        display.blit(self.boss_image, (750, 0))
         Geometric.renderRectangle(self.bossHP_rect_, ColorData(255, 255, 255), display, 5)
         
         HP_rect = self.bossHP_rect_.copy()
@@ -96,3 +96,26 @@ class Geometric:
         if boss.HP < self.monsters["boss"]["HP"]:
             HP_rect.w = int((boss.HP / self.monsters["boss"]["HP"]) * 800)
         Geometric.renderRectangle(HP_rect, ColorData(206, 0, 0), display, 5)
+        
+    def renderTimeLeft(self, display):
+        if self.game.startTime >= 0:
+            timeLeft_bg = pygame.image.load(os.path.join(self.game.background_dir, "time_left.png"))
+            display.blit(timeLeft_bg, (515, 65))
+            
+            # huge_font = pygame.font.SysFont('comicsansms', 72) 
+            
+            self.game.countdownTime = int(self.game.countdown - (pygame.time.get_ticks() - self.game.startTime) / 1000)
+            
+            if self.game.countdownTime > 2:
+                minutes = (self.game.countdownTime - 2) // 60
+                remaining_seconds = (self.game.countdownTime - 2) % 60
+                countdownString = str(minutes) + " : " + str(remaining_seconds)
+                
+                countdownText = self.game.Huge_font.render(str(countdownString), True, self.COLORWHITE)
+                countdownPosition = countdownText.get_rect()
+                countdownPosition.center = (750, 120)
+                display.blit(countdownText, countdownPosition)
+            
+            else:
+                # if self.game.inMap == 1:
+                self.exit_state()

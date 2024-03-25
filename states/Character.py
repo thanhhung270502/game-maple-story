@@ -113,12 +113,17 @@ class Character(State, CommonFunc):
             HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
             HandleFile.saveFile(self.game.char_dir, "items.json", items)
         
-        
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
         if actions["k_3"]:
             stats["bullet"] = "star_normal"
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
             
         elif actions["k_4"]:
             stats["bullet"] = "star_special"
+            HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
+            HandleFile.saveFile(self.game.char_dir, "items.json", items)
         
         stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
         items = HandleFile.loadFile(self.game.char_dir, "items.json")

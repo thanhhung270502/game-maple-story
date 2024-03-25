@@ -91,11 +91,12 @@ class OptionMenu(State, CommonFunc):
         self.add_skills_box = pygame.Rect(294, 199, 15, 15)
 
     def update(self, actions, screen):
-        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
-        items = HandleFile.loadFile(self.game.char_dir, "items.json")
         
         self.fps_timer.start()
         self.p_player.handleInputAction(actions)
+        
+        stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        items = HandleFile.loadFile(self.game.char_dir, "items.json")
         
         if actions["up"]:
             self.p_player.input_type_.up_ = 1
@@ -249,6 +250,9 @@ class OptionMenu(State, CommonFunc):
             self.jay_message = None
             self.game.background_sound.stop()
             self.game.map1_sound.play(loops=-1)
+            self.game.startTime = pygame.time.get_ticks()
+            self.game.inMap = 1
+            
             new_state = Map1(self.game)
             new_state.enter_state()
             
@@ -429,9 +433,6 @@ class OptionMenu(State, CommonFunc):
         display.blit(self.vicious_bg, (500, 382))
         display.blit(self.jay_bg, (815, 420))
         
-        if self.jay_message:
-            display.blit(self.jay_message, (400, 210))
-        
         self.p_player.show(display)
         
         self.renderItems(display, map_data)
@@ -443,8 +444,8 @@ class OptionMenu(State, CommonFunc):
         self.renderBag(display)
         self.renderSkills(display)
         
-        self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
-        self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
+        # self.stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
+        # self.items = HandleFile.loadFile(self.game.char_dir, "items.json")
         Geometric.renderSpecifications(self, display)
         
         if self.p_player.input_type_.up_ == 1:
@@ -462,6 +463,9 @@ class OptionMenu(State, CommonFunc):
                     new_state.enter_state()
                     self.p_player.input_type_.up_ = 0
         
+        if self.jay_message:
+            display.blit(self.jay_message, (400, 210))
+            
         if self.shop_bg:
             self.renderShop(display)
             

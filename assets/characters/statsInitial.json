@@ -1,0 +1,20 @@
+{
+    "HP": 1000,
+    "HP_max": 1000,
+    "MP": 500,
+    "MP_max": 500,
+    "EXP": 0,
+    "EXP_max": 1000,
+    "meso": 135481120,
+    "attack": 1000,
+    "point_skill": 0,
+    "skill": {
+        "level": 1,
+        "damage": 1500,
+        "mana": 20,
+        "numOfMonsters": 2,
+        "numOfHit": 1
+    },
+    "level": 1,
+    "bullet": "star_special"
+}

@@ -386,8 +386,8 @@ class Map1(State, CommonFunc):
         self.renderBag(display)
         self.renderSkills(display)
         
-        
         Geometric.renderSpecifications(self, display)
+        Geometric.renderTimeLeft(self, display)
         
         if self.p_player.input_type_.up_ == 1:
             x1 = int(self.p_player.x_pos_ / self.TILE_SIZE)
@@ -406,6 +406,8 @@ class Map1(State, CommonFunc):
                     self.exit_state()
                     self.game.map1_sound.stop()
                     self.game.map2_sound.play(loops=-1)
+                    
+                    self.game.inMap = 2
                     new_state = Map2(self.game)
                     new_state.enter_state()
                     self.p_player.input_type_.up_ = 0

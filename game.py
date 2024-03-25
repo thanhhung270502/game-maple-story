@@ -33,6 +33,12 @@ class Game(CommonFunc):
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
         self.dragging = False
+        
+        self.countdown = 12
+        self.countdownTime = self.countdown
+        self.startTime = -1
+        self.inMap = 0
+        
         self.load_assets()
         self.load_states()
 
@@ -175,6 +181,9 @@ class Game(CommonFunc):
         self.medium_font = pygame.font.SysFont("Arial", 15, True)
         self.large_font = pygame.font.SysFont("Arial", 20, True)
         self.huge_font = pygame.font.SysFont("Arial", 30, True)
+        self.Huge_font = pygame.font.SysFont("Verdana", 70, True)
+        
+        # Courier New
 
     def load_states(self):
         self.title_screen = Title(self)

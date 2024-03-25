@@ -120,7 +120,6 @@ class Map3(State, CommonFunc):
         
         stats = HandleFile.loadFile(self.game.char_dir, "stats.json")
         if actions["left"] and self.add_skills_box.collidepoint(pygame.mouse.get_pos()) and stats["point_skill"] > 0:
-            print("Y")
             stats["point_skill"] -= 1
             stats["skill"]["level"] += 1
             stats["skill"]["damage"] += 100
@@ -445,6 +444,7 @@ class Map3(State, CommonFunc):
         self.renderSkills(display)
         
         Geometric.renderSpecifications(self, display)
+        Geometric.renderTimeLeft(self, display)
         
         if self.p_player.input_type_.up_ == 1:
             x1 = int(self.p_player.x_pos_ / self.TILE_SIZE)

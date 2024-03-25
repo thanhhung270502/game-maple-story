@@ -57,7 +57,7 @@ class CommonFunc():
         self.GRAVITY_SPEED = 10
         self.PLAYER_SPEED = 8
         self.MONSTER_SPEED = 4
-        self.BULLET_SPEED = 16
+        self.BULLET_SPEED = 24
         self.MAX_FALL_SPEED = 30
         self.PLAYER_JUMP = 32
         self.DISTANCE_OF_BULLET = 400
