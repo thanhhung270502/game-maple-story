@@ -39,6 +39,8 @@ class Character(State, CommonFunc):
         self.bullet_list_: list[Bullet] = []
         
         self.damage = 2
+        
+        self.died = False
     
     def setMapXY(self, x, y):
         self.map_x_[0] = x
@@ -62,6 +64,14 @@ class Character(State, CommonFunc):
         imageName = self.imageName + str(self.frame_) + ".png"
         image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
         display.blit(image, (rect_x, rect_y))
+        # if self.died == False:
+        #     imageName = self.imageName + str(self.frame_) + ".png"
+        #     image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
+        #     display.blit(image, (rect_x, rect_y))
+        # else:
+        #     imageName = "chardied.png"
+        #     image = pygame.image.load(os.path.join(self.game.char_dir, imageName))
+        #     display.blit(image, (rect_x, rect_y))
 
     def updateImagePlayer(self):
         if self.on_ground_:
@@ -129,7 +139,7 @@ class Character(State, CommonFunc):
         items = HandleFile.loadFile(self.game.char_dir, "items.json")
         if actions["k_1"] and items["HP"] > 0:
             items["HP"] -= 1
-            stats["HP"] += 200
+            stats["HP"] += stats["HP_max"] * 0.1
             if stats["HP"] > stats["HP_max"]:
                 stats["HP"] = stats["HP_max"]
             HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
@@ -139,7 +149,7 @@ class Character(State, CommonFunc):
         items = HandleFile.loadFile(self.game.char_dir, "items.json")
         if actions["k_2"] and items["MP"] > 0:
             items["MP"] -= 1
-            stats["MP"] += 100
+            stats["MP"] += stats["MP_max"] * 0.1
             if stats["MP"] > stats["MP_max"]:
                 stats["MP"] = stats["MP_max"]
             HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
@@ -149,6 +159,7 @@ class Character(State, CommonFunc):
             self.input_type_.pickUp_ = 1
         else:
             self.input_type_.pickUp_ = 0
+            
 
     def handleBullet(self, display):
         length = len(self.bullet_list_)

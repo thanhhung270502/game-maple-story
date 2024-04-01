@@ -89,6 +89,14 @@ class OptionMenu(State, CommonFunc):
         
         self.close_skills_box = pygame.Rect(288, 117, 19, 19)
         self.add_skills_box = pygame.Rect(294, 199, 15, 15)
+        
+        # dropdown
+        self.dropdown_bg = None
+        
+        self.menu_box = pygame.Rect(751, 678, 55, 42)
+        self.dropdown_item_box = pygame.Rect(806, 630, 100, 30)
+        self.dropdown_skill_box = pygame.Rect(806, 660, 100, 30)
+        self.dropdown_quit_box = pygame.Rect(806, 690, 100, 30)
 
     def update(self, actions, screen):
         
@@ -102,6 +110,11 @@ class OptionMenu(State, CommonFunc):
             self.p_player.input_type_.up_ = 1
         else:
             self.p_player.input_type_.up_ = 0
+        
+        if actions["k_esc"]:
+            self.p_player.input_type_.menu_ = 1
+        else:
+            self.p_player.input_type_.menu_ = 0
             
         if actions["left"] and self.vicious_box.collidepoint(pygame.mouse.get_pos()):
             self.shop_bg = pygame.image.load(os.path.join(self.game.items_dir, "shop.png"))
@@ -255,6 +268,33 @@ class OptionMenu(State, CommonFunc):
             
             new_state = Map1(self.game)
             new_state.enter_state()
+            
+        if self.p_player.input_type_.menu_ == 1 or (actions["left"] and self.menu_box.collidepoint(pygame.mouse.get_pos())):
+            if self.dropdown_bg:
+                self.dropdown_bg = None
+            else:
+                self.dropdown_bg = pygame.image.load(os.path.join(self.game.background_dir, "dropdown.png"))
+        
+        if self.dropdown_bg:
+            if actions["left"] and self.dropdown_item_box.collidepoint(pygame.mouse.get_pos()):
+                if self.bag_bg:
+                    self.bag_bg = None
+                    self.item_selected = -1
+                    self.dragging = False
+                else:
+                    self.bag_bg = pygame.image.load(os.path.join(self.game.items_dir, "bag.png"))
+                    self.item_selected = -1
+                    self.dragging = False
+            
+            if actions["left"] and self.dropdown_skill_box.collidepoint(pygame.mouse.get_pos()):
+                if self.skills_bg:
+                    self.skills_bg = None
+                else:
+                    self.skills_bg = pygame.image.load(os.path.join(self.game.items_dir, "skills.png"))
+            
+            if actions["left"] and self.dropdown_quit_box.collidepoint(pygame.mouse.get_pos()):
+                self.exit_state()
+            
             
         HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
         HandleFile.saveFile(self.game.char_dir, "items.json", items)
@@ -471,6 +511,10 @@ class OptionMenu(State, CommonFunc):
             
         HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
         HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
+        
+        if self.dropdown_bg:
+            display.blit(self.dropdown_bg, (806, 630))
+        
         
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND

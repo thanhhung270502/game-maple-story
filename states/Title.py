@@ -11,7 +11,7 @@ class Title(State):
     def __init__(self, game):
         State.__init__(self, game)
         # self.play_box = pygame.Rect(450, 305, 380, 110)
-        self.start_box = pygame.Rect(1125, 360, 150, 90)
+        self.start_box = pygame.Rect(400, 600, 700, 100)
         self.img_background = None
 
     def update(self, actions, screen):

@@ -86,6 +86,11 @@ class Geometric:
         # Footbar
         footbar_image = pygame.image.load(os.path.join(self.game.background_dir, "footbar.png"))
         display.blit(footbar_image, (485, 678))
+        
+        # menu
+        menuButon_image = pygame.image.load(os.path.join(self.game.background_dir, "menu.png"))
+        display.blit(menuButon_image, (751, 678))
+        
     
     def renderHPBoss(self, display, boss):
         display.blit(self.boss_image, (750, 0))
@@ -99,23 +104,45 @@ class Geometric:
         
     def renderTimeLeft(self, display):
         if self.game.startTime >= 0:
-            timeLeft_bg = pygame.image.load(os.path.join(self.game.background_dir, "time_left.png"))
-            display.blit(timeLeft_bg, (515, 65))
-            
-            # huge_font = pygame.font.SysFont('comicsansms', 72) 
-            
-            self.game.countdownTime = int(self.game.countdown - (pygame.time.get_ticks() - self.game.startTime) / 1000)
-            
-            if self.game.countdownTime > 2:
-                minutes = (self.game.countdownTime - 2) // 60
-                remaining_seconds = (self.game.countdownTime - 2) % 60
-                countdownString = str(minutes) + " : " + str(remaining_seconds)
+            if self.game.map2:
+                timeLeft_bg = pygame.image.load(os.path.join(self.game.background_dir, "time_left.png"))
+                display.blit(timeLeft_bg, (1010, 20))
                 
-                countdownText = self.game.Huge_font.render(str(countdownString), True, self.COLORWHITE)
-                countdownPosition = countdownText.get_rect()
-                countdownPosition.center = (750, 120)
-                display.blit(countdownText, countdownPosition)
-            
+                # huge_font = pygame.font.SysFont('comicsansms', 72) 
+                
+                self.game.countdownTime = int(self.game.countdown - (pygame.time.get_ticks() - self.game.startTime) / 1000)
+                
+                if self.game.countdownTime > 2:
+                    minutes = (self.game.countdownTime - 2) // 60
+                    remaining_seconds = (self.game.countdownTime - 2) % 60
+                    countdownString = str(minutes) + " : " + str(remaining_seconds)
+                    
+                    countdownText = self.game.Huge_font.render(str(countdownString), True, self.COLORWHITE)
+                    countdownPosition = countdownText.get_rect()
+                    countdownPosition.center = (750, 75)
+                    display.blit(countdownText, countdownPosition)
+                
+                else:
+                    # if self.game.inMap == 1:
+                    self.exit_state()
             else:
-                # if self.game.inMap == 1:
-                self.exit_state()
+                timeLeft_bg = pygame.image.load(os.path.join(self.game.background_dir, "time_left.png"))
+                display.blit(timeLeft_bg, (515, 65))
+                
+                # huge_font = pygame.font.SysFont('comicsansms', 72) 
+                
+                self.game.countdownTime = int(self.game.countdown - (pygame.time.get_ticks() - self.game.startTime) / 1000)
+                
+                if self.game.countdownTime > 2:
+                    minutes = (self.game.countdownTime - 2) // 60
+                    remaining_seconds = (self.game.countdownTime - 2) % 60
+                    countdownString = str(minutes) + " : " + str(remaining_seconds)
+                    
+                    countdownText = self.game.Huge_font.render(str(countdownString), True, self.COLORWHITE)
+                    countdownPosition = countdownText.get_rect()
+                    countdownPosition.center = (750, 120)
+                    display.blit(countdownText, countdownPosition)
+                
+                else:
+                    # if self.game.inMap == 1:
+                    self.exit_state()

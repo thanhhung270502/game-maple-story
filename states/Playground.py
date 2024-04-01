@@ -314,6 +314,7 @@ class Playground(State, CommonFunc):
                 if value_1 > self.MAP_TILE:
                     self.exit_state()
                     self.p_player.input_type_.up_ = 0
+                    
         
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND

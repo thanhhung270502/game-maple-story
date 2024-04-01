@@ -69,6 +69,16 @@ class Map3(State, CommonFunc):
         # BOSS
         self.boss_image = pygame.image.load(os.path.join(self.game.monster_dir, "boss_img.png"))
         self.boss_spam_monster = 0
+        
+        self.game.map2 = False
+        
+        # dropdown
+        self.dropdown_bg = None
+        
+        self.menu_box = pygame.Rect(751, 678, 55, 42)
+        self.dropdown_item_box = pygame.Rect(806, 630, 100, 30)
+        self.dropdown_skill_box = pygame.Rect(806, 660, 100, 30)
+        self.dropdown_quit_box = pygame.Rect(806, 690, 100, 30)
 
     def update(self, actions, mouse_pos):
         # Check if the game was paused 
@@ -77,6 +87,8 @@ class Map3(State, CommonFunc):
         #     new_state.enter_state()
         
         self.fps_timer.start()
+        # if self.p_player.died == False:
+        #     self.p_player.handleInputAction(actions)
         self.p_player.handleInputAction(actions)
         
         if actions["up"]:
@@ -128,6 +140,33 @@ class Map3(State, CommonFunc):
                 stats["skill"]["numOfMonsters"] += 1
             HandleFile.saveFile(self.game.char_dir, "stats.json", stats)
         
+        if self.p_player.input_type_.menu_ == 1 or (actions["left"] and self.menu_box.collidepoint(pygame.mouse.get_pos())):
+            if self.dropdown_bg:
+                self.dropdown_bg = None
+            else:
+                self.dropdown_bg = pygame.image.load(os.path.join(self.game.background_dir, "dropdown.png"))
+        
+        if self.dropdown_bg:
+            if actions["left"] and self.dropdown_item_box.collidepoint(pygame.mouse.get_pos()):
+                if self.bag_bg:
+                    self.bag_bg = None
+                    self.item_selected = -1
+                    self.dragging = False
+                else:
+                    self.bag_bg = pygame.image.load(os.path.join(self.game.items_dir, "bag.png"))
+                    self.item_selected = -1
+                    self.dragging = False
+            
+            if actions["left"] and self.dropdown_skill_box.collidepoint(pygame.mouse.get_pos()):
+                if self.skills_bg:
+                    self.skills_bg = None
+                else:
+                    self.skills_bg = pygame.image.load(os.path.join(self.game.items_dir, "skills.png"))
+            
+            if actions["left"] and self.dropdown_quit_box.collidepoint(pygame.mouse.get_pos()):
+                self.exit_state()
+                self.exit_state()
+        
         self.game.reset_keys()
 
     def updateExp(self, monster):
@@ -172,9 +211,9 @@ class Map3(State, CommonFunc):
                     
                     if self.p_player.bullet_list_[i].name == "star_special":
                         if self.p_player.bullet_list_[i].skill == "ctrl":
-                            damage = self.stats["attack"] + 15
+                            damage = self.stats["attack"]*1.1
                         elif self.p_player.bullet_list_[i].skill == "v":
-                            damage = self.stats["skill"]["damage"] + 15
+                            damage = self.stats["skill"]["damage"]*1.1
 
                     elif self.p_player.bullet_list_[i].name == "star_normal":
                         if self.p_player.bullet_list_[i].skill == "ctrl":
@@ -256,6 +295,10 @@ class Map3(State, CommonFunc):
                 if currentTime >= 2000:
                     self.stats["HP"] -= self.dynamic_threats_list[i].attack
                     self.startTimeToCollision = pygame.time.get_ticks()
+                    
+                    # if self.stats["HP"] < 0:
+                    #     self.p_player.died = True
+                    
                     return
 
     def handleCollisionPickUp(self):
@@ -487,6 +530,9 @@ class Map3(State, CommonFunc):
         
         HandleFile.saveFile(self.game.char_dir, "stats.json", self.stats)
         HandleFile.saveFile(self.game.char_dir, "items.json", self.items)
+        
+        if self.dropdown_bg:
+            display.blit(self.dropdown_bg, (806, 630))
         
         real_imp_time = self.fps_timer.get_ticks()
         time_one_frame = 1000 / self.FRAME_PER_SECOND

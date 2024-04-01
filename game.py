@@ -28,16 +28,19 @@ class Game(CommonFunc):
                         "moveJump": False, "normalAttack": False, "pickUp": False,
                         "k_1": False, "k_2": False, "k_3": False, "k_4": False,
                         "k_c": False, "k_v": False, "k_b": False,
-                        "k_i": False, "dragging": False, "k_k": False}
+                        "k_i": False, "dragging": False, "k_k": False,
+                        "k_esc": False}
         self.mouse_pos = (0,0)
         self.dt, self.prev_time = 0, 0
         self.state_stack = []
         self.dragging = False
         
-        self.countdown = 12
+        self.countdown = 600
         self.countdownTime = self.countdown
         self.startTime = -1
         self.inMap = 0
+        
+        self.map2 = False
         
         self.load_assets()
         self.load_states()
@@ -101,7 +104,9 @@ class Game(CommonFunc):
                     self.actions["k_i"] = True
                 if event.key == pygame.K_k:
                     self.actions["k_k"] = True
-                self.mouse_pos = (0,0)
+                if event.key == pygame.K_ESCAPE:
+                    self.actions["k_esc"] = True
+                    self.mouse_pos = (0,0)
 
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_click = pygame.mouse.get_pressed()

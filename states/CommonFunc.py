@@ -147,6 +147,7 @@ class Input:
         self.jump_ = 0
         self.prevStep_ = 0
         self.pickUp_ = 0
+        self.menu_ = 0
 
 class Map:
     def __init__(self):
